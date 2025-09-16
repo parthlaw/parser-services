@@ -1,0 +1,92 @@
+steps:
+  - step: "HeaderExtraction"
+    file: "header-extraction"
+    key: "headers"
+    id: "header_extraction"
+    title: "Finding Table"
+    description: "Finding the bank statement table in your uploaded pdf"
+  - step: HeaderRecognition
+    file: header-recognition
+    key: headers
+    id: "header_recognition"
+    inputs:
+      - headers
+    title: "Categorizing Headers"
+    description: "Categorizing the headers from your bank statement."
+  - step: "CleanData"
+    file: "clean-data"
+    key: "clean_data"
+    id: clean_data
+    return_type: list
+    inputs:
+      - "headers"
+    title: "Cleaning Data"
+    description: "Removing noise and cleaning up extracted data."
+  - step: "ExtractColumnRange"
+    file: "extract-column-range"
+    key: "column_range"
+    id: extract_column_range
+    return_type: list
+    inputs:
+      - "headers"
+      - "clean_data"
+    title: "Detecting Columns"
+    description: "Determining each column position."
+  - step: "BuildColumnGroups"
+    file: "build-column-groups"
+    key: "header_groups"
+    id: group_columns
+    return_type: list
+    inputs:
+      - "column_range"
+      - "headers"
+      - "clean_data"
+    title: "Group Columns"
+    description: "Building the columns for your bank statement"
+  - step: "BuildRows"
+    file: build-rows
+    key: group_rows
+    id: group_rows
+    return_type: list
+    inputs:
+      - headers
+      - header_groups
+    title: "Build Rows"
+    description: "Assembling the rows."
+  - step: "MergeRows"
+    file: merge-rows
+    key: merge_rows
+    id: merge_rows
+    return_type: list
+    inputs:
+      - group_rows
+    title: "Merge Rows"
+    description: "Merging incomplete rows to form complete transactions."
+  - step: "FormatCleaner"
+    file: format-cleaner
+    key: format_cleaner
+    id: clean_format
+    return_type: list
+    inputs:
+      - merge_rows
+    title: "Format & Validate"
+    description: "Ensuring data accuracy and completeness."
+  - step: "SaveFormat"
+    file: "save-format"
+    key: "save_format"
+    id: save_format
+    return_type: list
+    inputs:
+      - "format_cleaner"
+    title: "Saving Format"
+    description: "Saving the format of the bank statement."
+  - step: "ResultScorer"
+    file: "result-scorer"
+    key: "result_scorer"
+    id: result_scorer
+    return_type: none
+    async: true
+    inputs:
+      - "save_format"
+    title: "Calculating Quality Score"
+    description: "Calculating the quality score of the parsed results."

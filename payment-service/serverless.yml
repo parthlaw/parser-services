@@ -1,0 +1,113 @@
+service: payment-service
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: "ap-south-1"
+  memorySize: 512
+  timeout: 30
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-this-in-production'}
+    JWT_EXPIRE_IN: ${env:JWT_EXPIRE_IN, '7d'}
+    API_VERSION: ${env:API_VERSION, 'v1'}
+    CORS_ORIGIN: ${env:CORS_ORIGIN, '*'}
+    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
+    RAZORPAY_KEY_ID: ${env:RAZORPAY_KEY_ID, 'your-razorpay-key-id'}
+    RAZORPAY_KEY_SECRET: ${env:RAZORPAY_KEY_SECRET, 'your-razorpay-key-secret'}
+    RAZORPAY_BASE_URL: ${env:RAZORPAY_BASE_URL, 'https://api.razorpay.com'}
+    RAZORPAY_WEBHOOK_SECRET: ${env:RAZORPAY_WEBHOOK_SECRET, 'your-razorpay-webhook-secret'}
+    PAYPAL_CLIENT_ID: ${env:PAYPAL_CLIENT_ID, 'your-paypal-client-id'}
+    PAYPAL_CLIENT_SECRET: ${env:PAYPAL_CLIENT_SECRET, 'your-paypal-client-secret'}
+    PAYPAL_BASE_URL: ${env:PAYPAL_BASE_URL, 'https://api-m.sandbox.paypal.com'}
+    PAYPAL_WEBHOOK_ID: ${env:PAYPAL_WEBHOOK_ID, 'your-paypal-webhook-id'}
+    PAYPAL_CLIENT_ID_SANDBOX: ${env:PAYPAL_CLIENT_ID_SANDBOX, 'your-paypal-client-id-sandbox'}
+    PAYPAL_CLIENT_SECRET_SANDBOX: ${env:PAYPAL_CLIENT_SECRET_SANDBOX, 'your-paypal-client-secret-sandbox'}
+    PAYPAL_BASE_URL_SANDBOX: ${env:PAYPAL_BASE_URL_SANDBOX, 'https://api-m.sandbox.paypal.com'}
+    PAYPAL_WEBHOOK_ID_SANDBOX: ${env:PAYPAL_WEBHOOK_ID_SANDBOX, 'your-paypal-webhook-id-sandbox'}
+    RAZORPAY_KEY_ID_SANDBOX: ${env:RAZORPAY_KEY_ID_SANDBOX, 'your-razorpay-key-id-sandbox'}
+    RAZORPAY_KEY_SECRET_SANDBOX: ${env:RAZORPAY_KEY_SECRET_SANDBOX, 'your-razorpay-key-secret-sandbox'}
+    RAZORPAY_BASE_URL_SANDBOX: ${env:RAZORPAY_BASE_URL_SANDBOX, 'https://api.razorpay.com'}
+    RAZORPAY_WEBHOOK_SECRET_SANDBOX: ${env:RAZORPAY_WEBHOOK_SECRET_SANDBOX, 'your-razorpay-webhook-secret-sandbox'}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:DescribeTable
+          Resource:
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-*
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.stage}-*/index/*
+
+plugins:
+  - serverless-offline
+
+custom:
+  dynamodb:
+    stages:
+      - dev               
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      heapInitial: 200m
+      heapMax: 1g
+      convertEmptyValues: true
+      seed: true         
+
+  dynamoEndpoint:
+    dev: http://localhost:8000   
+
+functions:
+  app:
+    handler: src/index.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors:
+            origin: ${env:CORS_ORIGIN, '*'}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors:
+            origin: ${env:CORS_ORIGIN, '*'}
+            headers:
+              - Content-Type
+              - Authorization
+            allowCredentials: true
+
+package:
+  individually: false
+  excludeDevDependencies: true
+  patterns:
+    - '!**/.git/**'
+    - '!**/.gitignore'
+    - '!**/README.md'
+    - '!**/.env.example'
+    - '!**/nodemon.json'
+    - '!**/jest.config.js'
+    - '!**/*.test.ts'
+    - '!**/*.spec.ts'
+    - '!**/coverage/**'
+    - '!**/logs/**'
