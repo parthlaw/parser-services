@@ -47,7 +47,6 @@ export class JobService {
     // Use Supabase for logged-in users, DynamoDB for anonymous users
     const repository = this.jobRepository;
     const result = await repository.getJob(id, userId as string);
-    console.log("RESULT", result);
     return result;
   }
   /**
@@ -68,11 +67,11 @@ export class JobService {
       // return 404 error
       throw new NotFoundError(`Job not found with id: ${id}`);
     }
-    if (job.status == JobStatus.FAILED) {
-      return { transactions: [], total: 0, hasMore: false, status: JobStatus.FAILED };
+    if (job.status.toLowerCase() == JobStatus.FAILED.toLowerCase()) {
+      return { transactions: [], pagination: { page: 0, limit: 0, total_count: 0, has_more: false }, status: JobStatus.FAILED };
     }
-    if (job.status == JobStatus.PROCESSING) {
-      return { transactions: [], total: 0, hasMore: false, status: JobStatus.PROCESSING };
+    if (job.status.toLowerCase() == JobStatus.PROCESSING.toLowerCase()) {
+      return { transactions: [], pagination: { page: 0, limit: 0, total_count: 0, has_more: false }, status: JobStatus.PROCESSING };
     }
     if (!job.result_s3_path) {
       throw new NotFoundError(`Job ${id} has no results available`);
@@ -93,7 +92,7 @@ export class JobService {
       // Read the file in a paginated manner using the JSONL repository
       const result = await this.jsonlRepository.readJsonlFile(tempFilePath, pagination);
 
-      return { transactions: result.data as Record<string, any>[], total: result.totalRead, hasMore: result.hasMore, status: JobStatus.SUCCESS };
+      return { transactions: result.data as Record<string, any>[], pagination: { page: pagination.offset/pagination.limit, limit: pagination.limit, total_count: result.total, has_more: result.hasMore }, status: JobStatus.SUCCESS };
     } finally {
       // Clean up the temp file
       const fs = await import('fs/promises');

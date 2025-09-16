@@ -23,9 +23,9 @@ export const getJob = asyncHandler(async (req: Request, res: Response): Promise<
 
 export const getResults = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     try {
-        const { offset, limit } = getResultsSchema.parse(req.query);
+        const { page, limit } = getResultsSchema.parse(req.query);
         const { id } = req.params;
-        const pagination = { offset, limit };
+        const pagination = { offset: page * limit, limit };
         const results = await getJobService(req.user?.id as string).getResults(id, req.user?.id as string, pagination);
         ApiResponseHandler.success(res, results, "Results fetched successfully");
     } catch (error) {

@@ -1,9 +1,9 @@
 // ---------- Jobs ----------
 export enum JobStatus {
   // PENDING = 'pending',
-  PROCESSING = 'processing',
-  SUCCESS = 'success',
-  FAILED = 'failed',
+  PROCESSING = 'PROCESSING',
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
 }
 
 export interface IJob {
@@ -40,6 +40,7 @@ export interface IJsonlPaginationOptions {
 
 export interface IJsonlReadResult<T> {
   data: T[];
+  total: number;
   hasMore: boolean;
   totalRead: number;
 }
@@ -52,7 +53,11 @@ export interface IJsonlFileMetadata {
 
 export interface IBankStatementResults {
   transactions: Record<string, any>[];
-  total: number;
-  hasMore: boolean;
+  pagination: {
+    page: number;
+    limit: number;
+    total_count: number;
+    has_more: boolean;
+  }
   status: JobStatus;
 }

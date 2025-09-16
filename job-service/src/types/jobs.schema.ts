@@ -7,8 +7,8 @@ export const createJobSchema = z.object({
 });
 
 export const getResultsSchema = z.object({
-    offset: z.string().optional().transform(val => val ? parseInt(val, 10) : 0),
-    limit: z.string().optional().transform(val => val ? parseInt(val, 10) : 100)
+    page: z.string().optional().transform(val => val ? parseInt(val) : 1),
+    limit: z.string().optional().transform(val => val ? parseInt(val) : 100)
 });
 export type CreateJobSchema = z.infer<typeof createJobSchema>;
 export type GetResultsSchema = z.infer<typeof getResultsSchema>;

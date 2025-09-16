@@ -50,6 +50,17 @@ export class JsonlRepository implements IJsonlRepository {
     let totalRead = 0;
     let hasMore = false;
 
+    // Count total lines first
+    const countRl = createInterface({
+      input: createReadStream(filePath),
+      crlfDelay: Infinity,
+    });
+    let total = 0;
+    for await (const _line of countRl) {
+      total++;
+    }
+
+    // Create a fresh readline interface for actual reading
     const rl = createInterface({
       input: createReadStream(filePath),
       crlfDelay: Infinity,
@@ -92,6 +103,7 @@ export class JsonlRepository implements IJsonlRepository {
       data: result,
       hasMore,
       totalRead,
+      total,
     };
   }
 
