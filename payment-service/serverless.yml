@@ -9,27 +9,26 @@ provider:
   timeout: 30
   environment:
     NODE_ENV: ${self:provider.stage}
-    JWT_SECRET: ${env:JWT_SECRET, 'your-super-secret-jwt-key-change-this-in-production'}
-    JWT_EXPIRE_IN: ${env:JWT_EXPIRE_IN, '7d'}
-    API_VERSION: ${env:API_VERSION, 'v1'}
-    CORS_ORIGIN: ${env:CORS_ORIGIN, '*'}
-    LOG_LEVEL: ${env:LOG_LEVEL, 'info'}
-    RAZORPAY_KEY_ID: ${env:RAZORPAY_KEY_ID, 'your-razorpay-key-id'}
-    RAZORPAY_KEY_SECRET: ${env:RAZORPAY_KEY_SECRET, 'your-razorpay-key-secret'}
-    RAZORPAY_BASE_URL: ${env:RAZORPAY_BASE_URL, 'https://api.razorpay.com'}
-    RAZORPAY_WEBHOOK_SECRET: ${env:RAZORPAY_WEBHOOK_SECRET, 'your-razorpay-webhook-secret'}
-    PAYPAL_CLIENT_ID: ${env:PAYPAL_CLIENT_ID, 'your-paypal-client-id'}
-    PAYPAL_CLIENT_SECRET: ${env:PAYPAL_CLIENT_SECRET, 'your-paypal-client-secret'}
-    PAYPAL_BASE_URL: ${env:PAYPAL_BASE_URL, 'https://api-m.sandbox.paypal.com'}
-    PAYPAL_WEBHOOK_ID: ${env:PAYPAL_WEBHOOK_ID, 'your-paypal-webhook-id'}
-    PAYPAL_CLIENT_ID_SANDBOX: ${env:PAYPAL_CLIENT_ID_SANDBOX, 'your-paypal-client-id-sandbox'}
-    PAYPAL_CLIENT_SECRET_SANDBOX: ${env:PAYPAL_CLIENT_SECRET_SANDBOX, 'your-paypal-client-secret-sandbox'}
-    PAYPAL_BASE_URL_SANDBOX: ${env:PAYPAL_BASE_URL_SANDBOX, 'https://api-m.sandbox.paypal.com'}
-    PAYPAL_WEBHOOK_ID_SANDBOX: ${env:PAYPAL_WEBHOOK_ID_SANDBOX, 'your-paypal-webhook-id-sandbox'}
-    RAZORPAY_KEY_ID_SANDBOX: ${env:RAZORPAY_KEY_ID_SANDBOX, 'your-razorpay-key-id-sandbox'}
-    RAZORPAY_KEY_SECRET_SANDBOX: ${env:RAZORPAY_KEY_SECRET_SANDBOX, 'your-razorpay-key-secret-sandbox'}
-    RAZORPAY_BASE_URL_SANDBOX: ${env:RAZORPAY_BASE_URL_SANDBOX, 'https://api.razorpay.com'}
-    RAZORPAY_WEBHOOK_SECRET_SANDBOX: ${env:RAZORPAY_WEBHOOK_SECRET_SANDBOX, 'your-razorpay-webhook-secret-sandbox'}
+    JWT_SECRET: ${self:custom.secrets.JWT_SECRET}
+    LOG_LEVEL: ${self:custom.logLevel.${sls:stage}, self:custom.logLevel.default}
+    RAZORPAY_KEY_ID: ${self:custom.secrets.RAZORPAY_KEY_ID}
+    RAZORPAY_KEY_SECRET: ${self:custom.secrets.RAZORPAY_KEY_SECRET}
+    RAZORPAY_BASE_URL: ${self:custom.secrets.RAZORPAY_BASE_URL}
+    RAZORPAY_WEBHOOK_SECRET: ${self:custom.secrets.RAZORPAY_WEBHOOK_SECRET}
+    PAYPAL_CLIENT_ID: ${self:custom.secrets.PAYPAL_CLIENT_ID}
+    PAYPAL_CLIENT_SECRET: ${self:custom.secrets.PAYPAL_CLIENT_SECRET}
+    PAYPAL_BASE_URL: ${self:custom.secrets.PAYPAL_BASE_URL}
+    PAYPAL_CLIENT_ID_SANDBOX: ${self:custom.secrets.PAYPAL_CLIENT_ID_SANDBOX}
+    PAYPAL_CLIENT_SECRET_SANDBOX: ${self:custom.secrets.PAYPAL_CLIENT_SECRET_SANDBOX}
+    PAYPAL_BASE_URL_SANDBOX: ${self:custom.secrets.PAYPAL_BASE_URL_SANDBOX}
+    RAZORPAY_KEY_ID_SANDBOX: ${self:custom.secrets.RAZORPAY_KEY_ID_SANDBOX}
+    RAZORPAY_KEY_SECRET_SANDBOX: ${self:custom.secrets.RAZORPAY_KEY_SECRET_SANDBOX}
+    RAZORPAY_BASE_URL_SANDBOX: ${self:custom.secrets.RAZORPAY_BASE_URL_SANDBOX}
+    RAZORPAY_WEBHOOK_SECRET_SANDBOX: ${self:custom.secrets.RAZORPAY_WEBHOOK_SECRET_SANDBOX}
+    SUPABASE_URL: ${self:custom.secrets.SUPABASE_URL}
+    SUPABASE_ANON_KEY: ${self:custom.secrets.SUPABASE_ANON_KEY}
+
+
 
   iam:
     role:
@@ -57,45 +56,32 @@ provider:
 
 plugins:
   - serverless-offline
-
+  - serverless-domain-manager
 custom:
-  dynamodb:
-    stages:
-      - dev               
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-      heapInitial: 200m
-      heapMax: 1g
-      convertEmptyValues: true
-      seed: true         
-
-  dynamoEndpoint:
-    dev: http://localhost:8000   
-
+  domainName: api.bankstatements2excel.com
+  secrets: ${ssm:/aws/reference/secretsmanager/parser-service}
+  customDomain:
+    domainName: ${self:custom.domainName}
+    basePath: ${sls:stage}/payment-service
+    stage: $default
+    createRoute53Record: false
+    endpointType: REGIONAL
+    apiType: http
+  logLevel:
+    prod: INFO
+    staging: DEBUG
+    dev: DEBUG
+    default: DEBUG
 functions:
   app:
-    handler: src/index.handler
+    handler: dist/index.handler
     events:
-      - http:
+      - httpApi:
           path: /
           method: ANY
-          cors:
-            origin: ${env:CORS_ORIGIN, '*'}
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: true
-      - http:
+      - httpApi:
           path: /{proxy+}
           method: ANY
-          cors:
-            origin: ${env:CORS_ORIGIN, '*'}
-            headers:
-              - Content-Type
-              - Authorization
-            allowCredentials: true
 
 package:
   individually: false
@@ -104,6 +90,8 @@ package:
     - '!**/.git/**'
     - '!**/.gitignore'
     - '!**/README.md'
+    - '!**/.env'
+    - '!**/.env.*'
     - '!**/.env.example'
     - '!**/nodemon.json'
     - '!**/jest.config.js'

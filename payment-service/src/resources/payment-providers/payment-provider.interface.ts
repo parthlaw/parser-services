@@ -59,7 +59,7 @@ export interface SubscriptionPlan {
 }
 
 export interface Subscription {
-  id?: string;
+  id: string;
   plan_id: string;
   customer?: {
     name?: string | null;
@@ -96,6 +96,22 @@ export interface WebhookEvent {
   resource_type: string;
   resource: any;
 }
+export enum WebhookEventAction {
+  CREATED = 'created',
+  UPDATED = 'updated',
+  DELETED = 'deleted',
+}
+export enum WebhookEventResourceType {
+  PAYMENT = 'payment',
+  SUBSCRIPTION = 'subscription',
+  REFUND = 'refund',
+  ORDER = 'order',
+}
+export interface WebhookEventResponse {
+  action: WebhookEventAction;
+  resource: WebhookEventResourceType;
+  data : Record<string, any>;
+}
 
 // Main payment provider interface
 export interface IPaymentProvider {
@@ -123,7 +139,7 @@ export interface IPaymentProvider {
 
   // Webhook Management
   verifyWebhookSignature?(headers: Record<string, string>, body: string): Promise<{ verified: boolean }>;
-  processWebhookEvent?(event: WebhookEvent): Promise<void>;
+  processWebhookEvent?(event: WebhookEvent): Promise<WebhookEventResponse>;
 }
 
 // Provider configuration interface

@@ -18,6 +18,7 @@ export enum SubscriptionStatus {
   ACTIVE = 'ACTIVE',
   CANCELLED = 'CANCELLED',
   EXPIRED = 'EXPIRED',
+  CREATED = 'CREATED',
 }
 
 export enum RefundStatus {
@@ -153,7 +154,7 @@ export interface PayPalSubscriber {
 }
 
 export interface PayPalSubscription {
-  id?: string;
+  id: string;
   plan_id: string;
   start_time?: string;
   quantity?: string;

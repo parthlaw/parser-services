@@ -9,6 +9,9 @@ import {
   RefundRequest,
   Refund,
   WebhookEvent,
+  WebhookEventResponse,
+  WebhookEventAction,
+  WebhookEventResourceType,
 } from "@/resources/payment-providers/payment-provider.interface";
 import {
   RazorpayOrder,
@@ -360,7 +363,7 @@ export class RazorpayProvider implements IPaymentProvider {
   /**
    * Process webhook event
    */
-  async processWebhookEvent(event: WebhookEvent): Promise<void> {
+  async processWebhookEvent(event: WebhookEvent): Promise<WebhookEventResponse> {
     logger.info(`Processing Razorpay webhook event: ${event.event_type}`, event);
 
     switch (event.event_type) {
@@ -388,6 +391,12 @@ export class RazorpayProvider implements IPaymentProvider {
       default:
         logger.info(`Unhandled webhook event type: ${event.event_type}`);
     }
+
+    return {
+      action: WebhookEventAction.CREATED,
+      resource: WebhookEventResourceType.SUBSCRIPTION,
+      data: event.resource,
+    };
   }
 
   // ==================== RAZORPAY SPECIFIC METHODS ====================

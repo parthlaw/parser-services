@@ -10,6 +10,9 @@ import {
   RefundRequest,
   Refund,
   WebhookEvent,
+  WebhookEventResponse,
+  WebhookEventAction,
+  WebhookEventResourceType,
 } from "@/resources/payment-providers/payment-provider.interface";
 import {
   PayPalAccessToken,
@@ -20,6 +23,7 @@ import {
   PayPalSubscription,
   PayPalRefund,
   PayPalRefundRequest,
+  SubscriptionStatus as PayPalSubscriptionStatus,
 } from "@/types/paypal.types";
 import logger from "@/utils/logger";
 
@@ -223,35 +227,12 @@ export class PayPalProvider implements IPaymentProvider {
    * Create a subscription
    */
   async createSubscription(subscriptionData: Subscription): Promise<Subscription> {
-    logger.info('Creating PayPal subscription:', subscriptionData);
+    logger.info('Subscriptions in Paypal are created via UI. Skipping this step', subscriptionData);
     
-    const paypalSubscriptionData: PayPalSubscription = {
-      plan_id: subscriptionData.plan_id,
-      subscriber: {
-        name: subscriptionData.customer?.name ? {
-          given_name: subscriptionData.customer.name.split(' ')[0],
-          surname: subscriptionData.customer.name.split(' ').slice(1).join(' ') || 'User',
-        } : {
-          given_name: null,
-          surname: null,
-        },
-        email_address: subscriptionData.customer?.email || null,
-      },
-      application_context: {
-        user_action: 'SUBSCRIBE_NOW',
-      },
-    };
-
-    const subscription = await this.makeRequest<PayPalSubscription>('/v1/billing/subscriptions', 'POST', paypalSubscriptionData);
     
     return {
-      id: subscription.id,
-      plan_id: subscription.plan_id,
-      customer: subscriptionData.customer,
-      status: subscription.status,
-      start_time: subscription.start_time,
-      links: subscription.links,
-    };
+      status: PayPalSubscriptionStatus.CREATED,
+    } as Subscription;
   }
 
   /**
@@ -377,10 +358,19 @@ export class PayPalProvider implements IPaymentProvider {
   /**
    * Process webhook event
    */
-  async processWebhookEvent(event: WebhookEvent): Promise<void> {
+  async processWebhookEvent(event: WebhookEvent): Promise<WebhookEventResponse> {
     logger.info(`Processing PayPal webhook event: ${event.event_type}`, event);
 
     switch (event.event_type) {
+      case "PAYMENT.SALE.COMPLETED":
+        logger.info('Payment sale completed:', event.resource);
+        return {
+          action: WebhookEventAction.CREATED,
+          resource: WebhookEventResourceType.PAYMENT,
+          data: {
+            subscriptionId: event.resource.billing_agreement_id
+          },
+        }
       case 'PAYMENT.CAPTURE.COMPLETED':
         logger.info('Payment capture completed:', event.resource);
         break;
@@ -392,7 +382,15 @@ export class PayPalProvider implements IPaymentProvider {
         break;
       case 'BILLING.SUBSCRIPTION.ACTIVATED':
         logger.info('Subscription activated:', event.resource);
-        break;
+        const subscriptionId = event.resource.id;
+        return {
+          action: WebhookEventAction.UPDATED,
+          resource: WebhookEventResourceType.SUBSCRIPTION,
+          data: {
+            subscriptionId,
+            status: event.resource.status,
+          },
+        };
       case 'BILLING.SUBSCRIPTION.CANCELLED':
         logger.info('Subscription cancelled:', event.resource);
         break;
@@ -405,5 +403,11 @@ export class PayPalProvider implements IPaymentProvider {
       default:
         logger.info(`Unhandled webhook event type: ${event.event_type}`);
     }
+
+    return {
+      action: WebhookEventAction.CREATED,
+      resource: WebhookEventResourceType.SUBSCRIPTION,
+      data: event.resource,
+    };
   }
 }

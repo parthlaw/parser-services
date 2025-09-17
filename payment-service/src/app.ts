@@ -1,7 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import compression from 'compression';
 import morgan from 'morgan';
 import config from '@/config/environment';
 import logger, { loggerStream } from '@/utils/logger';
@@ -27,9 +26,6 @@ const createApp = (): Application => {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }));
-
-  // Compression middleware
-  app.use(compression());
 
   // Body parsing middleware
   app.use(express.json({ limit: '10mb' }));

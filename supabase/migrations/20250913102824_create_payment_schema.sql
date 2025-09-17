@@ -8,7 +8,7 @@ CREATE TABLE subscriptions (
     gateway_plan_id VARCHAR NOT NULL,
     gateway_subscription_id VARCHAR NOT NULL,
     gateway payment_gateway NOT NULL,
-    status string NOT NULL DEFAULT 'active',
+    status VARCHAR NOT NULL DEFAULT 'active',
     start_date DATE NOT NULL,
     end_date DATE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -23,7 +23,7 @@ CREATE TABLE orders (
     gateway payment_gateway NOT NULL,
     amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
-    status string NOT NULL DEFAULT 'created',
+    status VARCHAR NOT NULL DEFAULT 'created',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -37,7 +37,7 @@ CREATE TABLE payments (
     gateway payment_gateway NOT NULL,
     amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
-    status string NOT NULL DEFAULT 'pending',
+    status VARCHAR NOT NULL DEFAULT 'pending',
     payment_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -54,7 +54,7 @@ CREATE TABLE refunds (
     payment_id UUID NOT NULL REFERENCES payments(id) ON DELETE CASCADE,
     gateway_refund_id VARCHAR NOT NULL,
     amount DECIMAL(10,2) NOT NULL CHECK (amount >= 0),
-    status string NOT NULL DEFAULT 'pending',
+    status VARCHAR NOT NULL DEFAULT 'pending',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

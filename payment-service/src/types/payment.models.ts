@@ -10,8 +10,7 @@ const captureOrderSchema = z.object({
 });
 
 const createSubscriptionSchema = z.object({
-  productName: z.string(),
-  planName: z.string(),
+  planId: z.string(),
   price: z.number(),
   currency: z.string(),
 });
@@ -19,5 +18,10 @@ const createSubscriptionSchema = z.object({
 const cancelSubscriptionSchema = z.object({
   subscriptionId: z.string(),
 });
+
+export interface CreateSubscriptionResult {
+  subscriptionId: string;
+  startDate: string;
+}
 
 export { createOrderSchema, captureOrderSchema, createSubscriptionSchema, cancelSubscriptionSchema };

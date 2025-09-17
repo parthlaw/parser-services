@@ -1,9 +1,10 @@
-import { IPaymentProvider } from '@/resources/payment-providers/payment-provider.interface';
+import { IPaymentProvider, WebhookEventAction, WebhookEventResourceType, WebhookEventResponse } from '@/resources/payment-providers/payment-provider.interface';
 import { paymentProviderFactory } from '@/resources/payment-providers/payment-provider.factory';
 import logger from '@/utils/logger';
 import PaymentRepositoryFactory, { PaymentRepository } from '@/repositories/payment-db.repository';
 import { User } from '@supabase/supabase-js';
 import { OrderStatus, PaymentGateway, SubscriptionStatus } from '@/types/database.models';
+import { CreateSubscriptionResult } from '@/types/payment.models';
 
 export class PaymentService {
   private provider: IPaymentProvider;
@@ -91,18 +92,19 @@ export class PaymentService {
    * Create a subscription with flexible interval
    */
   async createSubscription(
-    productName: string,
-    planName: string,
+    planId: string,
     price: string,
     currency: string,
     interval: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR',
     user: User,
-  ) {
+    subscriptionId?: string|null,
+  ): Promise<CreateSubscriptionResult> {
     try {
-      logger.info(`Creating ${interval.toLowerCase()} subscription for ${user.email}: ${productName} - ${price} ${currency}`);
+      logger.info(`Creating ${interval.toLowerCase()} subscription for ${user.email}: ${planId} - ${price} ${currency}`);
       const result = await this.provider.createSubscription(
         {
-          plan_id: planName,
+          id: subscriptionId || '',
+          plan_id: planId,
           customer: {
             name: user.user_metadata.name || null,
             email: user.email || null,
@@ -111,15 +113,18 @@ export class PaymentService {
       );
       await this.db.createSubscription({
         user_id: user.id,
-        gateway_plan_id: planName,
-        gateway_subscription_id: result.id || '',
+        gateway_plan_id: planId,
+        gateway_subscription_id: subscriptionId || result.id || '',
         gateway: this.provider.getProviderName() as PaymentGateway,
         status: result.status as SubscriptionStatus,
         start_date: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
       });
-      return result;
+      return {
+        subscriptionId: result.id,
+        startDate: new Date().toISOString(),
+      };
     } catch (error) {
       logger.error('Error creating subscription:', error);
       throw error;
@@ -130,19 +135,18 @@ export class PaymentService {
    * Create a monthly subscription (convenience method)
    */
   async createMonthlySubscription(
-    productName: string,
-    planName: string,
+    planId: string,
     monthlyPrice: string,
     user: User,
     currency: string = 'USD',
   ) {
     return await this.createSubscription(
-      productName,
-      planName,
+      planId,
       monthlyPrice,
       currency,
       'MONTH',
       user,
+      null
     );
   }
 
@@ -241,7 +245,25 @@ export class PaymentService {
       throw error;
     }
   }
-
+  private async handleWebhookEventUpdate(result: WebhookEventResponse) {
+    switch (result.resource) {
+      case WebhookEventResourceType.SUBSCRIPTION:
+        await this.db.updateSubscription(result.data.subscriptionId, {
+          status: result.data.status,
+          updated_at: new Date().toISOString(),
+          // last_payment_at: result.data.last_payment_at || null,
+        });
+      case WebhookEventResourceType.PAYMENT:
+        if (result.data.subscriptionId) {
+          await this.db.updateSubscription(result.data.subscriptionId, {
+            status: result.data.status,
+            updated_at: new Date().toISOString(),
+            // last_payment_at: result.data.last_payment_at || null,
+          });
+        }
+        break;
+    }
+  }
   /**
    * Process webhook event
    */
@@ -251,20 +273,19 @@ export class PaymentService {
       if (!this.provider.processWebhookEvent) {
         throw new Error('Webhook processing not supported by provider');
       }
-      await this.provider.processWebhookEvent(event);
+      const result = await this.provider.processWebhookEvent(event);
+      switch (result.action) {
+        case WebhookEventAction.UPDATED:
+          await this.handleWebhookEventUpdate(result);
+          break;
+      }
       return { success: true, message: 'Webhook processed successfully' };
     } catch (error) {
       logger.error('Error processing webhook:', error);
       throw error;
     }
   }
-
-  /**
-   * Get the current provider name
-   */
-  getProviderName(): string {
-    return this.provider.constructor.name;
-  }
+  
 }
 
 export default PaymentService;
