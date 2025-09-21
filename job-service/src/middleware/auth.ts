@@ -10,7 +10,7 @@ const JWT_ALGORITHM = (process.env.JWT_ALGORITHM || "HS256") as Algorithm;
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload & { id?: string; uid?: string };
+      user?: JwtPayload & { id?: string | undefined; uid?: string | undefined };
     }
   }
 }
@@ -24,8 +24,12 @@ export function withJwtAuth(req: Request, res: Response, next: NextFunction): vo
   const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] }) as JwtPayload;
-    // Attach user info to request
-    req.user = decoded;
+    // Attach user info to request with id and uid set from sub field
+    req.user = {
+      ...decoded,
+      id: decoded.sub || undefined,
+      uid: decoded.sub || undefined
+    };
     next();
   } catch (err: any) {
     return res.status(401).json({
@@ -52,12 +56,12 @@ export function withJwtAuthNoAuth(req: Request, _res: Response, next: NextFuncti
   const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, JWT_SECRET, { algorithms: [JWT_ALGORITHM] }) as JwtPayload;
-    // Attach user info to request with explicit type casting
+    // Attach user info to request with id and uid set from sub field
     req.user = {
       ...decoded,
       id: decoded.sub || undefined,
       uid: decoded.sub || undefined
-    } as JwtPayload & { id?: string; uid?: string };
+    };
     logger.debug('User authenticated successfully', { user_id: decoded.sub });
     next();
   } catch (err: any) {

@@ -1,0 +1,149 @@
+{
+  "bankstatements2excelbasic-USD-Monthly": {
+    "name": "Basic",
+    "pages": 300,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "USD"
+  },
+  "bankstatements2excelbasic-INR-Monthly": {
+    "name": "Basic",
+    "pages": 300,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "INR"
+  },
+  "bankstatements2excelbasic-EUR-Monthly": {
+    "name": "Basic",
+    "pages": 300,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "EUR"
+  },
+  "bankstatements2excelpro-USD-Monthly": {
+    "name": "Pro",
+    "pages": 700,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "USD"
+  },
+  "bankstatements2excelpro-INR-Monthly": {
+    "name": "Pro",
+    "pages": 700,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "INR"
+  },
+  "bankstatements2excelpro-EUR-Monthly": {
+    "name": "Pro",
+    "pages": 700,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "EUR"
+  },
+  "bankstatements2excelgrowth-USD-Monthly": {
+    "name": "Growth",
+    "pages": 2000,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "USD"
+  },
+  "bankstatements2excelgrowth-INR-Monthly": {
+    "name": "Growth",
+    "pages": 2000,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "INR"
+  },
+  "bankstatements2excelgrowth-EUR-Monthly": {
+    "name": "Growth",
+    "pages": 2000,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "EUR"
+  },
+  "bankstatements2excelpower-USD-Monthly": {
+    "name": "Power",
+    "pages": 5000,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "USD"
+  },
+  "bankstatements2excelpower-INR-Monthly": {
+    "name": "Power",
+    "pages": 5000,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "INR"
+  },
+  "bankstatements2excelpower-EUR-Monthly": {
+    "name": "Power",
+    "pages": 5000,
+    "type": "subscription",
+    "period": "/month",
+    "currency": "EUR"
+  },
+  "bankstatements2excel50pagecharge-USD": {
+    "name": "Starter Bundle",
+    "pages": 50,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "USD"
+  },
+  "bankstatements2excel50pagecharge-INR": {
+    "name": "Starter Bundle",
+    "pages": 50,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "INR"
+  },
+  "bankstatements2excel50pagecharge-EUR": {
+    "name": "Starter Bundle",
+    "pages": 50,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "EUR"
+  },
+  "bankstatements2excel100pagecharge-USD": {
+    "name": "Small Bundle",
+    "pages": 100,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "USD"
+  },
+  "bankstatements2excel100pagecharge-INR": {
+    "name": "Small Bundle",
+    "pages": 100,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "INR"
+  },
+  "bankstatements2excel100pagecharge-EUR": {
+    "name": "Small Bundle",
+    "pages": 100,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "EUR"
+  },
+  "bankstatements2excel1000pagecharge-USD": {
+    "name": "Large Bundle",
+    "pages": 1000,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "USD"
+  },
+  "bankstatements2excel1000pagecharge-INR": {
+    "name": "Large Bundle",
+    "pages": 1000,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "INR"
+  },
+  "bankstatements2excel1000pagecharge-EUR": {
+    "name": "Large Bundle",
+    "pages": 1000,
+    "type": "bundle",
+    "period": "one-time",
+    "currency": "EUR"
+  }
+}

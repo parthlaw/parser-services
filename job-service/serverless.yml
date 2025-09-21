@@ -45,6 +45,8 @@ provider:
     STAGE: ${sls:stage}
     BUCKET_NAME: ${self:custom.bucketName}
     QUEUE_NAME: ${self:custom.queueName}
+    CHARGEBEE_SITE: ${self:custom.secrets.CHARGEBEE_SITE}
+    CHARGEBEE_API_KEY: ${self:custom.secrets.CHARGEBEE_API_KEY}
 
 
 
@@ -109,6 +111,8 @@ custom:
   queueName: parser-service-${sls:stage}-queue.fifo
   secrets: ${ssm:/aws/reference/secretsmanager/parser-service}
   domainName: api.bankstatements2excel.com
+  serverless-offline:
+    httpPort: 4000
   customDomain:
     domainName: ${self:custom.domainName}
     basePath: ${sls:stage}/job-service

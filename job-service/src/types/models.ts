@@ -61,3 +61,112 @@ export interface IBankStatementResults {
   }
   status: JobStatus;
 }
+
+// ---------- User Gateway ID ----------
+export interface IUserGatewayId {
+  user_id: string;
+  gateway_user_id: string;
+  created_at: string;
+}
+
+export interface ICreateUserGatewayIdInput {
+  user_id: string;
+  gateway_user_id: string;
+}
+
+// ---------- Bundles ----------
+export interface IBundle {
+  id: string;
+  user_id: string;
+  bundle_type: string;
+  pages: number;
+  price: number;
+  currency: string;
+  purchased_at: string;
+  valid_until: string | null;
+  charge_id: string | null;
+}
+
+export interface ICreateBundleInput {
+  id: string;
+  user_id: string;
+  bundle_type: string;
+  pages: number;
+  price: number;
+  currency?: string;
+  purchased_at?: string;
+  valid_until?: string | null;
+  charge_id?: string | null;
+}
+
+export interface IUpdateBundleInput {
+  id: string;
+  bundle_type?: string;
+  pages?: number;
+  price?: number;
+  currency?: string;
+  valid_until?: string | null;
+}
+
+// ---------- Subscriptions ----------
+export interface ISubscription {
+  id: string;
+  user_id: string;
+  currency: string;
+  start_date: string;
+  end_date: string;
+  subscription_id: string | null;
+  item_price_id: string | null;
+  status: string;
+}
+
+export interface ICreateSubscriptionInput {
+  id: string;
+  user_id: string;
+  currency?: string;
+  start_date: string;
+  end_date: string;
+  subscription_id?: string | null;
+  item_price_id?: string | null;
+  status?: string;
+}
+
+export interface IUpdateSubscriptionInput {
+  id: string;
+  currency?: string;
+  start_date?: string;
+  end_date?: string;
+  subscription_id?: string | null;
+}
+
+// ---------- Page Credits ----------
+export interface IPageCredit {
+  id: string;
+  user_id: string;
+  change: number;
+  reason: string;
+  source_type: string;
+  reference_id: string | null;
+  created_at: string;
+  expires_at: string | null;
+}
+
+export interface ICreatePageCreditInput {
+  id: string;
+  user_id: string;
+  change: number;
+  reason: string;
+  source_type: string;
+  reference_id?: string | null;
+  created_at?: string;
+  expires_at?: string | null;
+}
+
+export interface IUpdatePageCreditInput {
+  id: string;
+  change?: number;
+  reason?: string;
+  source_type?: string;
+  reference_id?: string | null;
+  expires_at?: string | null;
+}

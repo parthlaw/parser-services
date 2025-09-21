@@ -1,0 +1,359 @@
+{
+  "tiers": [
+    {
+      "id": "free-anonymous",
+      "name": "Free",
+      "description": "Perfect for trying out the service",
+      "pricing": {
+        "USD": 0,
+        "INR": 0,
+        "EUR": 0
+      },
+      "pages": 10,
+      "popular": false,
+      "gradient": "from-gray-50 to-gray-100",
+      "border": "border-gray-200",
+      "priceColor": "text-gray-900",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "10 pages per month",
+        "No signup required",
+        "Basic CSV export",
+        "Standard processing"
+      ],
+      "type": "free",
+      "period": "/month",
+      "action": {
+        "type": "scroll",
+        "target": "#upload",
+        "text": "Start Free",
+        "icon": "User"
+      }
+    },
+    {
+      "id": "free-registered",
+      "name": "Free Plus",
+      "description": "More pages with free account",
+      "pricing": {
+        "USD": 0,
+        "INR": 0,
+        "EUR": 0
+      },
+      "pages": 30,
+      "popular": false,
+      "gradient": "from-blue-50 to-indigo-50",
+      "border": "border-blue-200",
+      "priceColor": "text-blue-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "30 pages per month",
+        "Save upload history",
+        "Basic batch processing",
+        "Email support"
+      ],
+      "type": "free",
+      "period": "/month",
+      "action": {
+        "type": "link",
+        "href": "/signup",
+        "text": "Sign Up Free",
+        "icon": "User"
+      }
+    },
+    {
+      "id": "basic-subscription",
+      "name": "Basic",
+      "description": "Great for regular users",
+      "pricing": {
+        "USD": 3.5,
+        "INR": 300,
+        "EUR": 3
+      },
+      "item_price_id": {
+        "USD": "bankstatements2excelbasic-USD-Monthly",
+        "INR": "bankstatements2excelbasic-INR-Monthly",
+        "EUR": "bankstatements2excelbasic-EUR-Monthly"
+      },
+      "pages": 300,
+      "popular": false,
+      "gradient": "from-green-50 to-emerald-50",
+      "border": "border-green-200",
+      "priceColor": "text-green-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "300 pages per month",
+        "Advanced Excel export",
+        "Transaction categorization",
+        "Priority support",
+        "Upload history"
+      ],
+      "type": "subscription",
+      "period": "/month",
+      "action": {
+        "type": "chargebee",
+        "text": "Start Basic Plan",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "basic-monthly"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "pro-subscription",
+      "name": "Pro",
+      "description": "Perfect for power users",
+      "pricing": {
+        "USD": 6,
+        "INR": 500,
+        "EUR": 5
+      },
+      "item_price_id": {
+        "USD": "bankstatements2excelpro-USD-Monthly",
+        "INR": "bankstatements2excelpro-INR-Monthly",
+        "EUR": "bankstatements2excelpro-EUR-Monthly"
+      },
+      "pages": 700,
+      "popular": true,
+      "gradient": "from-purple-50 to-pink-50",
+      "border": "border-purple-200",
+      "priceColor": "text-purple-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70 ring-2 ring-primary/20 hover:ring-primary/30",
+      "features": [
+        "700 pages per month",
+        "Advanced Excel export",
+        "Transaction categorization",
+        "Priority support",
+        "API access",
+        "Bulk processing"
+      ],
+      "type": "subscription",
+      "period": "/month",
+      "action": {
+        "type": "chargebee",
+        "text": "Start Pro Plan",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "pro-monthly"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "growth-subscription",
+      "name": "Growth",
+      "description": "For growing businesses",
+      "pricing": {
+        "USD": 14,
+        "INR": 1200,
+        "EUR": 12
+      },
+      "item_price_id":{
+        "USD": "bankstatements2excelgrowth-USD-Monthly",
+        "INR": "bankstatements2excelgrowth-INR-Monthly",
+        "EUR": "bankstatements2excelgrowth-EUR-Monthly"
+      },
+      "pages": 2000,
+      "popular": false,
+      "gradient": "from-orange-50 to-red-50",
+      "border": "border-orange-200",
+      "priceColor": "text-orange-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "2000 pages per month",
+        "Everything in Pro",
+        "Advanced analytics",
+        "Custom integrations",
+        "Dedicated support",
+        "Team collaboration"
+      ],
+      "type": "subscription",
+      "period": "/month",
+      "action": {
+        "type": "chargebee",
+        "text": "Start Growth Plan",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "growth-monthly"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "power-subscription",
+      "name": "Power",
+      "description": "Maximum processing power",
+      "pricing": {
+        "USD": 28,
+        "INR": 2500,
+        "EUR": 25
+      },
+      "item_price_id": {
+        "USD": "bankstatements2excelpower-USD-Monthly",
+        "INR": "bankstatements2excelpower-INR-Monthly",
+        "EUR": "bankstatements2excelpower-EUR-Monthly"
+      },
+      "pages": 5000,
+      "popular": false,
+      "gradient": "from-slate-50 to-gray-50",
+      "border": "border-slate-200",
+      "priceColor": "text-slate-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "5000 pages per month",
+        "Everything in Growth",
+        "White-label solution",
+        "Custom workflows",
+        "SLA guarantee",
+        "On-premise deployment"
+      ],
+      "type": "subscription",
+      "period": "/month",
+      "action": {
+        "type": "chargebee",
+        "text": "Start Power Plan",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "power-monthly"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bundle-50",
+      "name": "Starter Bundle",
+      "description": "One-time purchase for small needs",
+      "pricing": {
+        "USD": 1.7,
+        "INR": 85,
+        "EUR": 1.4
+      },
+      "item_price_id": {
+        "USD": "bankstatements2excel50pagecharge-USD",
+        "INR": "bankstatements2excel50pagecharge-INR",
+        "EUR": "bankstatements2excel50pagecharge-EUR"
+      },
+      "pages": 50,
+      "popular": false,
+      "gradient": "from-cyan-50 to-blue-50",
+      "border": "border-cyan-200",
+      "priceColor": "text-cyan-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "50 pages one-time",
+        "No monthly commitment",
+        "Basic export options",
+        "Standard support",
+        "6 months validity"
+      ],
+      "type": "bundle",
+      "action": {
+        "type": "chargebee",
+        "text": "Buy Bundle",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "bundle-50"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bundle-100",
+      "name": "Small Bundle",
+      "description": "Perfect for occasional use",
+      "pricing": {
+        "USD": 2,
+        "INR": 150,
+        "EUR": 1.5
+      },
+      "item_price_id": {
+        "USD": "bankstatements2excel100pagecharge-USD",
+        "INR": "bankstatements2excel100pagecharge-INR",
+        "EUR": "bankstatements2excel100pagecharge-EUR"
+      },
+      "pages": 100,
+      "popular": false,
+      "gradient": "from-teal-50 to-green-50",
+      "border": "border-teal-200",
+      "priceColor": "text-teal-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "100 pages one-time",
+        "No monthly commitment",
+        "Advanced export options",
+        "Priority support",
+        "1 year validity"
+      ],
+      "type": "bundle",
+      "action": {
+        "type": "chargebee",
+        "text": "Buy Bundle",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "bundle-100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bundle-1000",
+      "name": "Large Bundle",
+      "description": "Best value for bulk processing",
+      "pricing": {
+        "USD": 15,
+        "INR": 1300,
+        "EUR": 12
+      },
+      "item_price_id": {
+        "USD": "bankstatements2excel1000pagecharge-USD",
+        "INR": "bankstatements2excel1000pagecharge-INR",
+        "EUR": "bankstatements2excel1000pagecharge-EUR"
+      },
+      "pages": 1000,
+      "popular": false,
+      "gradient": "from-violet-50 to-purple-50",
+      "border": "border-violet-200",
+      "priceColor": "text-violet-600",
+      "buttonColor": "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl border border-primary/50 hover:border-primary/70",
+      "features": [
+        "1000 pages one-time",
+        "No monthly commitment",
+        "All export formats",
+        "Priority support",
+        "2 years validity",
+        "Bulk processing"
+      ],
+      "type": "bundle",
+      "action": {
+        "type": "chargebee",
+        "text": "Buy Bundle",
+        "icon": "CreditCard",
+        "chargebeeConfig": {
+          "subscriptionItems": [
+            {
+              "item_price_id": "bundle-1000"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

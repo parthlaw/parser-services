@@ -17,6 +17,8 @@ interface Config {
   SUPABASE_URL: string;
   SUPABASE_ANON_KEY: string;
   QUEUE_NAME: string;
+  CHARGEBEE_SITE: string;
+  CHARGEBEE_API_KEY: string;
 }
 
 const stageFromEnv = (process.env.STAGE || process.env.NODE_ENV || "dev").toLowerCase();
@@ -35,6 +37,8 @@ const config: Config = {
   SUPABASE_URL: process.env.SUPABASE_URL || "",
   SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || "",
   QUEUE_NAME: process.env.QUEUE_NAME || "",
+  CHARGEBEE_SITE: process.env.CHARGEBEE_SITE || "",
+  CHARGEBEE_API_KEY: process.env.CHARGEBEE_API_KEY || "",
 };
 
 

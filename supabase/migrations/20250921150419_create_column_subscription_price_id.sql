@@ -1,0 +1,1 @@
+ALTER TABLE subscriptions ADD COLUMN item_price_id VARCHAR;
