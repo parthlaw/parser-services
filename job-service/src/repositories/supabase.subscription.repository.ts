@@ -99,6 +99,8 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
     if (input.start_date !== undefined) updateData.start_date = input.start_date;
     if (input.end_date !== undefined) updateData.end_date = input.end_date;
     if (input.subscription_id !== undefined) updateData.subscription_id = input.subscription_id;
+    if (input.item_price_id !== undefined) updateData.item_price_id = input.item_price_id;
+    if (input.status !== undefined) updateData.status = input.status;
 
     const { data, error } = await this.supabase
       .from('subscriptions')

@@ -1,0 +1,1 @@
+ALTER TABLE bundles ADD COLUMN invoice_line_item_id VARCHAR(255) NULL;

@@ -1,0 +1,1 @@
+ALTER TABLE bundles ADD COLUMN invoice_id VARCHAR(255) NULL;

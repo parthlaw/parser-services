@@ -1,11 +1,11 @@
 {
-  "id": "vConWARVEBCdnlrdwZq2BMODYv4bBRh5",
-  "type": "checkout_new",
-  "url": "https://bankstatements2excel-test.chargebee.com/pages/v3/vConWARVEBCdnlrdwZq2BMODYv4bBRh5/",
+  "id": "geOl6CLGNLtNAluIJcdNP85Ix5izGGcdXD",
+  "type": "checkout_existing",
+  "url": "https://bankstatements2excel-test.chargebee.com/pages/v3/geOl6CLGNLtNAluIJcdNP85Ix5izGGcdXD/",
   "state": "succeeded",
   "embed": false,
-  "created_at": 1758462468,
-  "expires_at": 1758473268,
+  "created_at": 1758545923,
+  "expires_at": 1758556723,
   "object": "hosted_page",
   "content": {
     "subscription": {
@@ -21,20 +21,20 @@
       "started_at": 1758462490,
       "activated_at": 1758462490,
       "created_from_ip": "49.207.223.103",
-      "updated_at": 1758462491,
+      "updated_at": 1758545931,
       "has_scheduled_changes": false,
       "channel": "web",
-      "resource_version": 1758462491116,
+      "resource_version": 1758545931697,
       "deleted": false,
       "object": "subscription",
       "currency_code": "INR",
       "subscription_items": [
         {
-          "item_price_id": "bankstatements2excelbasic-INR-Monthly",
+          "item_price_id": "bankstatements2excelpower-INR-Monthly",
           "item_type": "plan",
           "quantity": 1,
-          "unit_price": 30000,
-          "amount": 30000,
+          "unit_price": 250000,
+          "amount": 250000,
           "free_quantity": 0,
           "object": "subscription_item"
         }
@@ -53,7 +53,9 @@
         "object": "shipping_address"
       },
       "due_invoices_count": 0,
-      "mrr": 0,
+      "mrr": 120000,
+      "exchange_rate": 1,
+      "base_currency_code": "INR",
       "has_scheduled_advance_invoices": false
     },
     "customer": {
@@ -67,10 +69,10 @@
       "created_at": 1758462490,
       "created_from_ip": "49.207.223.103",
       "taxability": "taxable",
-      "updated_at": 1758462490,
+      "updated_at": 1758545931,
       "pii_cleared": "active",
       "channel": "web",
-      "resource_version": 1758462490747,
+      "resource_version": 1758545931578,
       "deleted": false,
       "object": "customer",
       "billing_address": {
@@ -92,7 +94,7 @@
       "excess_payments": 0,
       "unbilled_charges": 0,
       "preferred_currency_code": "INR",
-      "mrr": 0,
+      "mrr": 120000,
       "primary_payment_source_id": "pm_AzywdeUxRJPBog3F",
       "payment_method": {
         "object": "payment_method",
@@ -123,74 +125,82 @@
       "payment_source_id": "pm_AzywdeUxRJPBog3F"
     },
     "invoice": {
-      "id": "10",
+      "id": "16",
       "customer_id": "AzywdeUxRJPB1g3D",
       "subscription_id": "169wYNUxRJJJMfoA",
       "recurring": true,
       "status": "paid",
-      "date": 1758462490,
-      "due_date": 1758462490,
+      "date": 1758545931,
+      "due_date": 1758545931,
       "net_term_days": 0,
       "price_type": "tax_exclusive",
       "exchange_rate": 1,
-      "total": 30000,
+      "total": 241953,
       "amount_due": 0,
       "amount_adjusted": 0,
-      "amount_paid": 30000,
-      "paid_at": 1758462491,
+      "amount_paid": 125816,
+      "paid_at": 1758545931,
       "write_off_amount": 0,
-      "credits_applied": 0,
-      "updated_at": 1758462491,
-      "resource_version": 1758462491106,
+      "credits_applied": 116137,
+      "updated_at": 1758545931,
+      "resource_version": 1758545931660,
       "deleted": false,
       "object": "invoice",
-      "first_invoice": true,
+      "first_invoice": false,
       "amount_to_collect": 0,
       "round_off_amount": 0,
-      "new_sales_amount": 30000,
       "has_advance_charges": false,
       "currency_code": "INR",
       "base_currency_code": "INR",
-      "generated_at": 1758462490,
+      "generated_at": 1758545931,
       "is_gifted": false,
       "term_finalized": true,
       "channel": "web",
       "tax": 0,
       "line_items": [
         {
-          "id": "li_AzywdeUxRJPEog3H",
-          "date_from": 1758462490,
+          "id": "li_16BbOqUxWxVv6rB5",
+          "date_from": 1758545931,
           "date_to": 1761054490,
-          "unit_amount": 30000,
+          "unit_amount": 241953,
           "quantity": 1,
-          "amount": 30000,
+          "amount": 241953,
           "pricing_model": "flat_fee",
           "is_taxed": false,
           "tax_amount": 0,
           "object": "line_item",
           "subscription_id": "169wYNUxRJJJMfoA",
           "customer_id": "AzywdeUxRJPB1g3D",
-          "description": "Bankstatements2Excel Basic",
+          "description": "Power - Prorated Charges",
           "entity_type": "plan_item_price",
-          "entity_id": "bankstatements2excelbasic-INR-Monthly",
-          "entity_description": "Best for light users. 300 pages/month.",
+          "entity_id": "bankstatements2excelpower-INR-Monthly",
           "tax_exempt_reason": "tax_not_configured",
           "discount_amount": 0,
           "item_level_discount_amount": 0
         }
       ],
-      "sub_total": 30000,
+      "sub_total": 241953,
       "linked_payments": [
         {
-          "txn_id": "txn_AzywdeUxRJPGWg3J",
-          "applied_amount": 30000,
-          "applied_at": 1758462491,
+          "txn_id": "txn_16BbOqUxWxVy3rBB",
+          "applied_amount": 125816,
+          "applied_at": 1758545931,
           "txn_status": "success",
-          "txn_date": 1758462491,
-          "txn_amount": 30000
+          "txn_date": 1758545931,
+          "txn_amount": 125816
         }
       ],
-      "applied_credits": [],
+      "applied_credits": [
+        {
+          "applied_amount": 116137,
+          "applied_at": 1758545931,
+          "cn_id": "TEST-CN-5",
+          "cn_reason_code": "subscription_change",
+          "cn_create_reason_code": "Subscription Change",
+          "cn_date": 1758545931,
+          "cn_status": "refunded"
+        }
+      ],
       "adjustment_credit_notes": [],
       "issued_credit_notes": [],
       "linked_orders": [],
@@ -240,8 +250,121 @@
       "tax_origin": {
         "country": "IN"
       }
-    }
+    },
+    "credit_notes": [
+      {
+        "id": "TEST-CN-5",
+        "customer_id": "AzywdeUxRJPB1g3D",
+        "subscription_id": "169wYNUxRJJJMfoA",
+        "reference_invoice_id": "15",
+        "type": "refundable",
+        "reason_code": "subscription_change",
+        "status": "refunded",
+        "date": 1758545931,
+        "price_type": "tax_exclusive",
+        "exchange_rate": 1,
+        "total": 116137,
+        "amount_allocated": 116137,
+        "amount_refunded": 0,
+        "amount_available": 0,
+        "refunded_at": 1758545931,
+        "generated_at": 1758545931,
+        "updated_at": 1758545931,
+        "channel": "web",
+        "resource_version": 1758545931689,
+        "deleted": false,
+        "object": "credit_note",
+        "create_reason_code": "Subscription Change",
+        "currency_code": "INR",
+        "round_off_amount": 0,
+        "fractional_correction": 0,
+        "base_currency_code": "INR",
+        "sub_total": 116137,
+        "line_items": [
+          {
+            "id": "li_16BbOqUxWxVvRrB7",
+            "date_from": 1758545931,
+            "date_to": 1761054490,
+            "unit_amount": 116137,
+            "quantity": 1,
+            "amount": 116137,
+            "pricing_model": "flat_fee",
+            "is_taxed": false,
+            "tax_amount": 0,
+            "object": "line_item",
+            "subscription_id": "169wYNUxRJJJMfoA",
+            "customer_id": "AzywdeUxRJPB1g3D",
+            "description": "Growth - Prorated Credits for 22-Sep-2025 - 21-Oct-2025",
+            "entity_type": "plan_item_price",
+            "entity_id": "bankstatements2excelgrowth-INR-Monthly",
+            "reference_line_item_id": "li_16BbOqUxWwqOSqV4",
+            "tax_exempt_reason": "tax_not_configured",
+            "discount_amount": 0,
+            "item_level_discount_amount": 0
+          }
+        ],
+        "taxes": [],
+        "line_item_taxes": [],
+        "line_item_discounts": [],
+        "linked_refunds": [],
+        "allocations": [
+          {
+            "allocated_amount": 116137,
+            "allocated_at": 1758545931,
+            "invoice_id": "16",
+            "invoice_date": 1758545931,
+            "invoice_status": "paid"
+          }
+        ],
+        "billing_address": {
+          "first_name": "Parth",
+          "last_name": "Lawania",
+          "line1": "DSR Regency, Green Glen Layout",
+          "line2": "Bellendur",
+          "city": "Bangalore",
+          "state_code": "KA",
+          "state": "Karnataka",
+          "country": "IN",
+          "zip": "560103",
+          "validation_status": "not_validated",
+          "object": "billing_address"
+        },
+        "shipping_address": {
+          "first_name": "Parth",
+          "last_name": "Lawania",
+          "line1": "DSR Regency, Green Glen Layout",
+          "line2": "Bellendur",
+          "city": "Bangalore",
+          "state_code": "KA",
+          "state": "Karnataka",
+          "country": "IN",
+          "zip": "560103",
+          "validation_status": "not_validated",
+          "object": "shipping_address"
+        },
+        "customer_notes": "",
+        "site_details_at_creation": {
+          "timezone": "Asia/Calcutta",
+          "organization_address": {
+            "organization_name": "Bankstatements2Excel",
+            "email": "support@bankstatements2excel.com",
+            "line1": "Green Glen Layout",
+            "line2": "Bellendur",
+            "city": "Bangalore",
+            "state_code": "AN",
+            "state": "Andaman and Nicobar Islands",
+            "country_code": "IN",
+            "zip": "560103",
+            "phone": "6397847348",
+            "website": "https://www.bankstatements2excel.com"
+          }
+        },
+        "tax_origin": {
+          "country": "IN"
+        }
+      }
+    ]
   },
-  "updated_at": 1758462491,
-  "resource_version": 1758462491188
+  "updated_at": 1758545931,
+  "resource_version": 1758545931779
 }

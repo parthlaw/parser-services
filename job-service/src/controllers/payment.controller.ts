@@ -6,7 +6,6 @@ import { asyncHandler } from "@/middleware/errorHandler";
 import { PurchaseType } from "@/resources/chargebee/types";
 
 const getPaymentService = (req: Request) => {
-    console.log('>>> req.user', req.user);
     return new PaymentService(req.user as User);
 }
 

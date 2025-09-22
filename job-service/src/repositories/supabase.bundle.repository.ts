@@ -29,7 +29,8 @@ export class SupabaseBundleRepository implements IBundleRepository {
         currency: input.currency || 'USD',
         purchased_at: input.purchased_at,
         valid_until: input.valid_until,
-        charge_id: input.charge_id,
+        invoice_id: input.invoice_id,
+        invoice_line_item_id: input.invoice_line_item_id,
       })
       .select()
       .single();

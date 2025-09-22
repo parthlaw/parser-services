@@ -1,4 +1,4 @@
-import { IPageCredit, ICreatePageCreditInput, IUpdatePageCreditInput } from '@/types/models';
+import { IPageCredit, ICreatePageCreditInput, IUpdatePageCreditInput, IPageCreditBalance } from '@/types/models';
 
 export interface IPageCreditRepository {
   createPageCredit(input: ICreatePageCreditInput): Promise<IPageCredit>;
@@ -10,4 +10,5 @@ export interface IPageCreditRepository {
   getPageCreditsByReferenceId(referenceId: string): Promise<IPageCredit[]>;
   updatePageCredit(input: IUpdatePageCreditInput): Promise<IPageCredit>;
   deletePageCredit(id: string, userId: string): Promise<void>;
+  getRemainingPageCredits(userId: string): Promise<IPageCreditBalance[]>;
 }

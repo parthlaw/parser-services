@@ -8,8 +8,6 @@ export const getChargebeeClient = (): Chargebee => {
   if (!chargebeeClient) {
     try {
       console.log(process.env)
-      console.log('>>> getEnvVar.CHARGEBEE_SITE', getEnvVar.CHARGEBEE_SITE);
-      console.log('>>> getEnvVar.CHARGEBEE_API_KEY', getEnvVar.CHARGEBEE_API_KEY);
       chargebeeClient = new Chargebee({
         site: getEnvVar.CHARGEBEE_SITE,
         apiKey: getEnvVar.CHARGEBEE_API_KEY,

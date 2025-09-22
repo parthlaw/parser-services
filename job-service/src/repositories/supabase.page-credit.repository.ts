@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { IPageCredit, ICreatePageCreditInput, IUpdatePageCreditInput } from '@/types/models';
+import { IPageCredit, ICreatePageCreditInput, IUpdatePageCreditInput, IPageCreditBalance } from '@/types/models';
 import { IPageCreditRepository } from './page-credit.repository';
 import envConfig from '@/config/environment';
 
@@ -170,5 +170,18 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
     if (error) {
       throw error;
     }
+  }
+
+  async getRemainingPageCredits(userId: string): Promise<IPageCreditBalance[]> {
+    const { data, error } = await this.supabase
+      .rpc('get_remaining_page_credits', {
+        uid: userId
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    return data || [];
   }
 }

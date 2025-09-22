@@ -92,7 +92,17 @@ export class JobService {
       // Read the file in a paginated manner using the JSONL repository
       const result = await this.jsonlRepository.readJsonlFile(tempFilePath, pagination);
 
-      return { transactions: result.data as Record<string, any>[], pagination: { page: pagination.offset/pagination.limit, limit: pagination.limit, total_count: result.total, has_more: result.hasMore }, status: JobStatus.SUCCESS };
+      return { 
+        transactions: result.data as Record<string, any>[], 
+        pagination: { 
+          page: pagination.offset / pagination.limit, 
+          limit: pagination.limit, 
+          total_count: result.total, 
+          has_more: result.hasMore 
+        }, 
+        pdfPages: job.num_pages || 0, 
+        status: JobStatus.SUCCESS 
+      };
     } finally {
       // Clean up the temp file
       const fs = await import('fs/promises');

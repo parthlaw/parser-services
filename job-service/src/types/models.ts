@@ -53,6 +53,7 @@ export interface IJsonlFileMetadata {
 
 export interface IBankStatementResults {
   transactions: Record<string, any>[];
+  pdfPages?: number;
   pagination: {
     page: number;
     limit: number;
@@ -84,7 +85,8 @@ export interface IBundle {
   currency: string;
   purchased_at: string;
   valid_until: string | null;
-  charge_id: string | null;
+  invoice_id: string | null;
+  invoice_line_item_id: string | null;
 }
 
 export interface ICreateBundleInput {
@@ -96,7 +98,8 @@ export interface ICreateBundleInput {
   currency?: string;
   purchased_at?: string;
   valid_until?: string | null;
-  charge_id?: string | null;
+  invoice_id?: string | null;
+  invoice_line_item_id?: string | null;
 }
 
 export interface IUpdateBundleInput {
@@ -137,9 +140,18 @@ export interface IUpdateSubscriptionInput {
   start_date?: string;
   end_date?: string;
   subscription_id?: string | null;
+  item_price_id?: string | null;
+  status?: string;
 }
 
 // ---------- Page Credits ----------
+export interface IPageCreditBalance {
+  reference_id: string;
+  source_type: string;
+  expires_at: string | null;
+  balance: number;
+}
+
 export interface IPageCredit {
   id: string;
   user_id: string;

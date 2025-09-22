@@ -6,7 +6,7 @@ import {
     ChargebeeCustomerCreateDto,
     ChargebeeItemPrice,
 } from './types';
-import { HostedPage} from 'chargebee';
+import { HostedPage } from 'chargebee';
 
 export const getCustomer = async (customerId: string): Promise<ChargebeeCustomer> => {
     const chargebee = getChargebeeClient();
@@ -62,6 +62,7 @@ export const generateHostedCheckoutOneTime = async (chargeItems: ChargebeeItemPr
     const chargebee = getChargebeeClient();
     const result = await chargebee.hostedPage.checkoutOneTimeForItems({
         item_prices: chargeItems,
+        currency_code: 'INR',
         customer: {
             first_name: customer.first_name,
             last_name: customer.last_name,
@@ -73,7 +74,16 @@ export const generateHostedCheckoutOneTime = async (chargeItems: ChargebeeItemPr
     });
     return result.hosted_page;
 };
-
+export const generateHostedExistingCheckout = async (subscriptionId: string, subscriptionItems: ChargebeeItemPrice[]) => {
+    const chargebee = getChargebeeClient();
+    const result = await chargebee.hostedPage.checkoutExistingForItems({
+        subscription: {
+            id: subscriptionId,
+        },
+        subscription_items: subscriptionItems,
+    });
+    return result.hosted_page;
+}
 export const getHostedCheckout = async (hostedCheckoutId: string): Promise<HostedPage> => {
     const chargebee = getChargebeeClient();
     const result = await chargebee.hostedPage.retrieve(hostedCheckoutId);
