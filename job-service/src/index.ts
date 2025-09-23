@@ -5,11 +5,11 @@ import logger from '@/utils/logger';
 
 /**
  * Server Entry Point
- * 
+ *
  * This file serves two purposes:
  * 1. Exports a serverless handler for AWS Lambda deployment
  * 2. Runs a local development server when NODE_ENV=development
- * 
+ *
  * To run locally:
  * - Set NODE_ENV=development in your .env file or environment
  * - Run: npm run dev or node dist/index.js
@@ -41,7 +41,7 @@ export const handler = serverless(app, {
 // For local development - check both NODE_ENV and if we're not in AWS Lambda
 if (config.NODE_ENV === 'development' && !process.env.AWS_LAMBDA_FUNCTION_NAME) {
   const PORT = config.PORT;
-  
+
   app.listen(PORT, 'localhost', () => {
     logger.info(`🚀 Server running in ${config.NODE_ENV} mode on localhost:${PORT}`, {
       port: PORT,
@@ -49,7 +49,7 @@ if (config.NODE_ENV === 'development' && !process.env.AWS_LAMBDA_FUNCTION_NAME) 
       version: config.API_VERSION,
       url: `http://localhost:${PORT}`,
     });
-    
+
     // Log available endpoints
     logger.info(`📖 API Documentation available at http://localhost:${PORT}/health`);
     logger.info(`🔗 Server ready at http://localhost:${PORT}`);

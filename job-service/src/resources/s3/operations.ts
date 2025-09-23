@@ -7,7 +7,7 @@ import {
   _Object as S3Object,
   GetObjectCommandOutput,
 } from '@aws-sdk/client-s3';
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3Client } from './client';
 import getEnvVar from '../../config/environment';
 
@@ -43,10 +43,7 @@ export const downloadFile = async (
   );
 };
 
-export const deleteFile = async (
-  key: string,
-  bucket: string = defaultBucket
-): Promise<void> => {
+export const deleteFile = async (key: string, bucket: string = defaultBucket): Promise<void> => {
   const client = getS3Client();
   await client.send(
     new DeleteObjectCommand({
@@ -70,10 +67,7 @@ export const checkFileExists = async (
     );
     return true;
   } catch (error) {
-    if ((error as any)?.name === 'NotFound') {
-      return false;
-    }
-    throw error;
+    return false;
   }
 };
 
@@ -97,11 +91,8 @@ export const downloadFileToDisk = async (
   // Create write stream to save file
   const { pipeline } = await import('stream/promises');
   const { createWriteStream } = await import('fs');
-  
-  await pipeline(
-    response.Body as NodeJS.ReadableStream,
-    createWriteStream(localPath)
-  );
+
+  await pipeline(response.Body as NodeJS.ReadableStream, createWriteStream(localPath));
 };
 
 export const listFiles = async (
@@ -129,5 +120,26 @@ export const getPresignedUrl = async (
     Key: key,
   });
   const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+  return url;
+};
+
+/**
+ * Generates a presigned download URL for an S3 object
+ * @param key S3 object key
+ * @param expiresIn URL expiration time in seconds (default: 3600)
+ * @param bucket Optional bucket name (defaults to environment variable)
+ * @returns Presigned download URL
+ */
+export const getDownloadUrl = async (
+  key: string,
+  expiresIn: number = 3600,
+  bucket: string = defaultBucket
+): Promise<string> => {
+  const client = getS3Client();
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  });
+  const url = await getSignedUrl(client, command, { expiresIn });
   return url;
 };

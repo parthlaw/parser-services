@@ -8,7 +8,6 @@ export class DynamoDBResource {
   private readonly docClient: DynamoDBDocumentClient;
 
   private constructor() {
-
     // Log the configuration being used
     logger.info('DynamoDB client configuration', {
       region: process.env.AWS_REGION,

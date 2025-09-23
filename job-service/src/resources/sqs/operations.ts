@@ -4,7 +4,7 @@ import {
   DeleteMessageCommand,
   SendMessageBatchCommand,
   SendMessageBatchRequestEntry,
-  Message
+  Message,
 } from '@aws-sdk/client-sqs';
 import { getSQSClient } from './client';
 import getEnvVar from '../../config/environment';
@@ -12,9 +12,9 @@ import logger from '@/utils/logger';
 import { v4 as uuidv4 } from 'uuid';
 
 export const getQueueUrl = (queueName: string): string => {
- const QUEUE_URL = "https://sqs.ap-south-1.amazonaws.com/851725386253/" + queueName;
- return QUEUE_URL;
-}
+  const QUEUE_URL = 'https://sqs.ap-south-1.amazonaws.com/851725386253/' + queueName;
+  return QUEUE_URL;
+};
 const defaultQueueUrl = getQueueUrl(getEnvVar.QUEUE_NAME);
 export const sendMessage = async (
   messageBody: string,
@@ -96,7 +96,7 @@ export const sendMessageBatch = async (
 ) => {
   const client = getSQSClient();
   try {
-    const batchEntries: SendMessageBatchRequestEntry[] = entries.map(entry => ({
+    const batchEntries: SendMessageBatchRequestEntry[] = entries.map((entry) => ({
       Id: entry.id,
       MessageBody: entry.messageBody,
       MessageAttributes: entry.messageAttributes,
@@ -115,7 +115,11 @@ export const sendMessageBatch = async (
       failed: result.Failed || [],
     };
   } catch (error) {
-    logger.error('Failed to send message batch to SQS', { error, queueUrl, entriesCount: entries.length });
+    logger.error('Failed to send message batch to SQS', {
+      error,
+      queueUrl,
+      entriesCount: entries.length,
+    });
     throw error;
   }
 };

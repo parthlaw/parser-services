@@ -1,9 +1,9 @@
 // ---------- Jobs ----------
 export enum JobStatus {
   // PENDING = 'pending',
-  PROCESSING = 'PROCESSING',
-  SUCCESS = 'SUCCESS',
-  FAILED = 'FAILED',
+  PROCESSING = 'processing',
+  SUCCESS = 'success',
+  FAILED = 'failed',
 }
 
 export interface IJob {
@@ -59,8 +59,9 @@ export interface IBankStatementResults {
     limit: number;
     total_count: number;
     has_more: boolean;
-  }
+  };
   status: JobStatus;
+  deleted?: boolean;
 }
 
 // ---------- User Gateway ID ----------
@@ -121,6 +122,7 @@ export interface ISubscription {
   subscription_id: string | null;
   item_price_id: string | null;
   status: string;
+  pageCredits?: number;
 }
 
 export interface ICreateSubscriptionInput {
@@ -181,4 +183,66 @@ export interface IUpdatePageCreditInput {
   source_type?: string;
   reference_id?: string | null;
   expires_at?: string | null;
+}
+
+// ---------- Download URL ----------
+export type SupportedDownloadFormat = 'csv' | 'json' | 'xlsx' | 'jsonl';
+
+export interface IDownloadUrlOptions {
+  jobId: string;
+  format: SupportedDownloadFormat;
+  expiresIn?: number;
+}
+
+export interface IDownloadUrlResult {
+  downloadUrl: string;
+  expiresIn: number;
+  format: SupportedDownloadFormat;
+  jobId: string;
+}
+
+// ---------- Analytics ----------
+export interface IJobAnalytics {
+  monthlyStats: {
+    userId: string;
+    timestamp: string;
+    totalJobs: number;
+    completedJobs: number;
+    failedJobs: number;
+    processedJobs: number;
+  };
+}
+
+// ---------- Job List ----------
+export interface IJobListItem {
+  id: string;
+  filename: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IJobListPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
+
+export interface IJobListResponse {
+  jobs: IJobListItem[];
+  total: number;
+  completed: number;
+  failed: number;
+  processing: number;
+  pagination: IJobListPagination;
+}
+
+export interface IJobListFilters {
+  page?: number | undefined;
+  limit?: number | undefined;
+  status?: string | undefined;
+  filename?: string | undefined;
 }

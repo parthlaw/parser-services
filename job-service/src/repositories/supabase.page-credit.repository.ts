@@ -1,5 +1,10 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { IPageCredit, ICreatePageCreditInput, IUpdatePageCreditInput, IPageCreditBalance } from '@/types/models';
+import {
+  IPageCredit,
+  ICreatePageCreditInput,
+  IUpdatePageCreditInput,
+  IPageCreditBalance,
+} from '@/types/models';
 import { IPageCreditRepository } from './page-credit.repository';
 import envConfig from '@/config/environment';
 
@@ -40,7 +45,7 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
     return data as IPageCredit;
   }
   async createPageCredits(input: ICreatePageCreditInput[]): Promise<IPageCredit[]> {
-    const insertData = input.map(item => ({
+    const insertData = input.map((item) => ({
       id: item.id,
       user_id: item.user_id,
       change: item.change,
@@ -51,10 +56,7 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
       expires_at: item.expires_at,
     }));
 
-    const { data, error } = await this.supabase
-      .from('page_credits')
-      .insert(insertData)
-      .select();
+    const { data, error } = await this.supabase.from('page_credits').insert(insertData).select();
 
     if (error) {
       throw error;
@@ -72,7 +74,8 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') { // Record not found
+      if (error.code === 'PGRST116') {
+        // Record not found
         return null;
       }
       throw error;
@@ -139,7 +142,7 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
 
   async updatePageCredit(input: IUpdatePageCreditInput): Promise<IPageCredit> {
     const updateData: any = {};
-    
+
     if (input.change !== undefined) updateData.change = input.change;
     if (input.reason !== undefined) updateData.reason = input.reason;
     if (input.source_type !== undefined) updateData.source_type = input.source_type;
@@ -173,10 +176,11 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
   }
 
   async getRemainingPageCredits(userId: string): Promise<IPageCreditBalance[]> {
-    const { data, error } = await this.supabase
-      .rpc('get_remaining_page_credits', {
-        uid: userId
-      });
+    const { data, error } = await this.supabase.rpc('get_remaining_page_credits', {
+      uid: userId,
+    });
+    console.log('>>> data', JSON.stringify(data, null, 2));
+    console.log('>>> error', JSON.stringify(error, null, 2));
 
     if (error) {
       throw error;

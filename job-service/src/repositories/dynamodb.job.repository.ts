@@ -1,6 +1,6 @@
 import { DynamoDBOperations } from '@/resources/dynamodb/operations';
 import { IJob, ICreateJobInput, JobStatus } from '@/types/models';
-import { IJobRepository } from './job.repository';
+import { IJobRepository, JobCounts } from './job.repository';
 
 export class DynamoDBJobRepository implements IJobRepository {
   private readonly tableName: string;
@@ -40,5 +40,12 @@ export class DynamoDBJobRepository implements IJobRepository {
 
   async getJobs(_userId: string): Promise<IJob[] | null> {
     return [];
+  }
+  async getJobCounts(_userId: string): Promise<JobCounts> {
+    return {
+      total: 0,
+      completed: 0,
+      failed: 0,
+    };
   }
 }

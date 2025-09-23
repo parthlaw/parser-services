@@ -1,13 +1,13 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const getPdfUploadUrlSchema = z.object({
-    filename: z.string(),
+  filename: z.string(),
 });
 
 export type GetPdfUploadUrlSchema = z.infer<typeof getPdfUploadUrlSchema>;
 
 export interface GetPdfUploadUrlResponse {
-    presignedUrl: string;
-    jobId: string;
-    key: string;
+  presignedUrl: string;
+  jobId: string;
+  key: string;
 }

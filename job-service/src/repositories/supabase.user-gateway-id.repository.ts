@@ -42,7 +42,8 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') { // Record not found
+      if (error.code === 'PGRST116') {
+        // Record not found
         return null;
       }
       throw error;
@@ -72,7 +73,8 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') { // Record not found
+      if (error.code === 'PGRST116') {
+        // Record not found
         return null;
       }
       throw error;

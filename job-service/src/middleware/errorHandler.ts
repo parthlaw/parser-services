@@ -41,7 +41,9 @@ export const errorHandler = (
     errorCode = 'API_ERROR';
   } else if (error instanceof ZodError) {
     statusCode = 400;
-    message = 'Validation Error: ' + error.issues.map((issue: any) => `${issue.path.join('.')}: ${issue.message}`).join(', ');
+    message =
+      'Validation Error: ' +
+      error.issues.map((issue: any) => `${issue.path.join('.')}: ${issue.message}`).join(', ');
     errorCode = 'VALIDATION_ERROR';
   } else if (error.name === 'ValidationError') {
     statusCode = 400;

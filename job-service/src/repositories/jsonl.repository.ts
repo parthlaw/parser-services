@@ -4,7 +4,10 @@ import logger from '@/utils/logger';
 import { IJsonlPaginationOptions, IJsonlReadResult, IJsonlFileMetadata } from '@/types/models';
 
 export interface IJsonlRepository {
-  readJsonlFile<T>(filePath: string, paginationOptions: IJsonlPaginationOptions): Promise<IJsonlReadResult<T>>;
+  readJsonlFile<T>(
+    filePath: string,
+    paginationOptions: IJsonlPaginationOptions
+  ): Promise<IJsonlReadResult<T>>;
 }
 
 export class JsonlRepository implements IJsonlRepository {
@@ -109,7 +112,7 @@ export class JsonlRepository implements IJsonlRepository {
 
   private async getOrCreateFileMetadata(filePath: string): Promise<IJsonlFileMetadata> {
     let metadata = this.fileMetadataCache.get(filePath);
-    
+
     if (!metadata) {
       metadata = {
         filePath,

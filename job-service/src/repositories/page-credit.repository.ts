@@ -1,4 +1,9 @@
-import { IPageCredit, ICreatePageCreditInput, IUpdatePageCreditInput, IPageCreditBalance } from '@/types/models';
+import {
+  IPageCredit,
+  ICreatePageCreditInput,
+  IUpdatePageCreditInput,
+  IPageCreditBalance,
+} from '@/types/models';
 
 export interface IPageCreditRepository {
   createPageCredit(input: ICreatePageCreditInput): Promise<IPageCredit>;

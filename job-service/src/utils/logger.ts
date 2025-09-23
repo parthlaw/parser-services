@@ -30,10 +30,7 @@ const logger = winston.createLogger({
   transports: [
     // Console transport for all environments
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
   ],
 });
@@ -48,7 +45,7 @@ if (config.NODE_ENV === 'production') {
       maxFiles: 5,
     })
   );
-  
+
   logger.add(
     new winston.transports.File({
       filename: 'logs/combined.log',

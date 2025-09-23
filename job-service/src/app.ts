@@ -13,10 +13,12 @@ const createApp = (): Application => {
   const app: Application = express();
 
   // Security middleware
-  app.use(helmet({
-    contentSecurityPolicy: false, // Disable CSP for API
-    crossOriginEmbedderPolicy: false,
-  }));
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Disable CSP for API
+      crossOriginEmbedderPolicy: false,
+    })
+  );
 
   // CORS is handled by API Gateway, not Express
 

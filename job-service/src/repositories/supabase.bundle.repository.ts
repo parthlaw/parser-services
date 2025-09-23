@@ -51,7 +51,8 @@ export class SupabaseBundleRepository implements IBundleRepository {
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') { // Record not found
+      if (error.code === 'PGRST116') {
+        // Record not found
         return null;
       }
       throw error;
@@ -90,7 +91,7 @@ export class SupabaseBundleRepository implements IBundleRepository {
 
   async updateBundle(input: IUpdateBundleInput): Promise<IBundle> {
     const updateData: any = {};
-    
+
     if (input.bundle_type !== undefined) updateData.bundle_type = input.bundle_type;
     if (input.pages !== undefined) updateData.pages = input.pages;
     if (input.price !== undefined) updateData.price = input.price;

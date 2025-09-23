@@ -154,7 +154,7 @@
         "INR": 1200,
         "EUR": 12
       },
-      "item_price_id":{
+      "item_price_id": {
         "USD": "bankstatements2excelgrowth-USD-Monthly",
         "INR": "bankstatements2excelgrowth-INR-Monthly",
         "EUR": "bankstatements2excelgrowth-EUR-Monthly"

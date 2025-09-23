@@ -49,7 +49,8 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') { // Record not found
+      if (error.code === 'PGRST116') {
+        // Record not found
         return null;
       }
       throw error;
@@ -73,10 +74,9 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
     return data as ISubscription[];
   }
 
-
   async getActiveSubscriptions(userId: string): Promise<ISubscription[]> {
     const now = new Date().toISOString();
-    
+
     const { data, error } = await this.supabase
       .from('subscriptions')
       .select()
@@ -94,7 +94,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
 
   async updateSubscription(input: IUpdateSubscriptionInput): Promise<ISubscription> {
     const updateData: any = {};
-    
+
     if (input.currency !== undefined) updateData.currency = input.currency;
     if (input.start_date !== undefined) updateData.start_date = input.start_date;
     if (input.end_date !== undefined) updateData.end_date = input.end_date;

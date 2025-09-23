@@ -31,10 +31,13 @@ export class DynamoDBOperations {
     const result = await this.dynamoDB.executeOperation(
       'GetItem',
       params.tableName,
-      () => this.dynamoDB.getDocumentClient().send(new GetCommand({
-        TableName: params.tableName,
-        Key: params.key,
-      })),
+      () =>
+        this.dynamoDB.getDocumentClient().send(
+          new GetCommand({
+            TableName: params.tableName,
+            Key: params.key,
+          })
+        ),
       { key: params.key }
     );
 
@@ -45,10 +48,13 @@ export class DynamoDBOperations {
     await this.dynamoDB.executeOperation(
       'PutItem',
       params.tableName,
-      () => this.dynamoDB.getDocumentClient().send(new PutCommand({
-        TableName: params.tableName,
-        Item: params.item,
-      })),
+      () =>
+        this.dynamoDB.getDocumentClient().send(
+          new PutCommand({
+            TableName: params.tableName,
+            Item: params.item,
+          })
+        ),
       { item: params.item }
     );
 
@@ -59,14 +65,22 @@ export class DynamoDBOperations {
     const result = await this.dynamoDB.executeOperation(
       'UpdateItem',
       params.tableName,
-      () => this.dynamoDB.getDocumentClient().send(new UpdateCommand({
-        TableName: params.tableName,
-        Key: params.key,
-        UpdateExpression: params.updateExpression,
-        ExpressionAttributeNames: params.expressionAttributeNames,
-        ExpressionAttributeValues: params.expressionAttributeValues,
-        ReturnValues: (params.returnValues || 'ALL_NEW') as 'ALL_NEW' | 'UPDATED_OLD' | 'UPDATED_NEW' | 'ALL_OLD' | undefined,
-      })),
+      () =>
+        this.dynamoDB.getDocumentClient().send(
+          new UpdateCommand({
+            TableName: params.tableName,
+            Key: params.key,
+            UpdateExpression: params.updateExpression,
+            ExpressionAttributeNames: params.expressionAttributeNames,
+            ExpressionAttributeValues: params.expressionAttributeValues,
+            ReturnValues: (params.returnValues || 'ALL_NEW') as
+              | 'ALL_NEW'
+              | 'UPDATED_OLD'
+              | 'UPDATED_NEW'
+              | 'ALL_OLD'
+              | undefined,
+          })
+        ),
       { key: params.key }
     );
 
