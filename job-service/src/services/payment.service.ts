@@ -131,6 +131,7 @@ export class PaymentService {
       id: uuidv4(),
       user_id: this.user.id,
       created_at: new Date().toISOString(),
+      job_id: null,
     };
   }
 

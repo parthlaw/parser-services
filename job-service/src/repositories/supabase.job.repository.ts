@@ -14,18 +14,7 @@ export class SupabaseJobRepository implements IJobRepository {
       throw new Error('Supabase configuration is missing');
     }
 
-    this.supabase = createClient(supabaseUrl, supabaseKey, {
-      // print request url,body,headers
-      global: {
-        fetch: async (url, options) => {
-          console.log('>>> Fetching URL:', url);
-          console.log('>>> Fetching Options:', options);
-          const response = await fetch(url, options);
-          console.log('>>> Response:', response);
-          return response;
-        },
-      },
-    });
+    this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
   async createJob(input: ICreateJobInput): Promise<IJob> {
@@ -35,7 +24,7 @@ export class SupabaseJobRepository implements IJobRepository {
         user_id: input.user_id,
         source_key: input.sourceKey,
         filename: input.filename,
-        job_id: input.job_id,
+        id: input.job_id,
         status: JobStatus.PROCESSING,
       })
       .select()
@@ -66,12 +55,13 @@ export class SupabaseJobRepository implements IJobRepository {
     return data as IJob;
   }
 
-  async getJobs(userId: string): Promise<IJob[] | null> {
+  async getJobs(userId: string, offset: number, limit: number): Promise<IJob[] | null> {
     const { data, error } = await this.supabase
       .from('jobs')
       .select()
       .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (error) {
       if (error.code === 'PGRST116') {

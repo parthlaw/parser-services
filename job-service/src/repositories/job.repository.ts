@@ -9,6 +9,6 @@ export interface JobCounts {
 export interface IJobRepository {
   createJob(input: ICreateJobInput): Promise<IJob>;
   getJob(id: string, userId: string): Promise<IJob | null>;
-  getJobs(userId: string): Promise<IJob[] | null>;
+  getJobs(userId: string, offset: number, limit: number): Promise<IJob[] | null>;
   getJobCounts(userId: string): Promise<JobCounts>;
 }

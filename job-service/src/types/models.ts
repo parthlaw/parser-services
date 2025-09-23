@@ -157,6 +157,7 @@ export interface IPageCreditBalance {
 export interface IPageCredit {
   id: string;
   user_id: string;
+  job_id: string | null;
   change: number;
   reason: string;
   source_type: string;

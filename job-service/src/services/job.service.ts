@@ -25,6 +25,7 @@ import { NotFoundError, ValidationError } from '@/utils/errors';
 import { IPageCreditRepository } from '@/repositories/page-credit.repository';
 import { SupabasePageCreditRepository } from '@/repositories/supabase.page-credit.repository';
 import { v4 as uuidv4 } from 'uuid';
+import logger from '@/utils/logger';
 
 export class JobService {
   private readonly jsonlRepository: IJsonlRepository;
@@ -108,11 +109,11 @@ export class JobService {
    * @returns Job list response with pagination and status counts
    */
   async getJobs(filters?: IJobListFilters): Promise<IJobListResponse> {
-    const { page = 1, limit = 10, status, filename } = filters || {};
+    const { page = 1, limit = 10, status: _status, filename: _filename } = filters || {};
     const offset = (page - 1) * limit;
 
     // Get jobs with pagination
-    const jobs = await this.jobRepository.getJobs(this.userId as string);
+    const jobs = await this.jobRepository.getJobs(this.userId as string, offset, limit);
     if (!jobs) {
       return {
         jobs: [],
@@ -131,32 +132,16 @@ export class JobService {
       };
     }
 
-    // Apply filters
-    let filteredJobs = jobs;
-    if (status) {
-      filteredJobs = filteredJobs.filter(
-        (job) => job.status.toLowerCase() === status.toLowerCase()
-      );
-    }
-    if (filename) {
-      const searchTerm = filename.toLowerCase();
-      filteredJobs = filteredJobs.filter((job) =>
-        (job.filename || '').toLowerCase().includes(searchTerm)
-      );
-    }
-
     // Calculate status counts
-    const completed = filteredJobs.filter((job) => job.status === JobStatus.SUCCESS).length;
-    const failed = filteredJobs.filter((job) => job.status === JobStatus.FAILED).length;
-    const processing = filteredJobs.filter((job) => job.status === JobStatus.PROCESSING).length;
+    const completed = jobs.filter((job) => job.status === JobStatus.SUCCESS).length;
+    const failed = jobs.filter((job) => job.status === JobStatus.FAILED).length;
+    const processing = jobs.filter((job) => job.status === JobStatus.PROCESSING).length;
 
     // Apply pagination
-    const total = filteredJobs.length;
+    const total = jobs.length;
     const totalPages = Math.ceil(total / limit);
-    const paginatedJobs = filteredJobs.slice(offset, offset + limit);
-
     // Process jobs to ensure filename is populated
-    const processedJobs: IJobListItem[] = paginatedJobs.map((job) => ({
+    const processedJobs: IJobListItem[] = jobs.map((job) => ({
       id: job.id,
       filename: job.filename || 'Unknown',
       status: job.status,
@@ -246,7 +231,7 @@ export class JobService {
     } finally {
       // Clean up the temp file
       const fs = await import('fs/promises');
-      await fs.unlink(tempFilePath).catch(() => {}); // Ignore errors in cleanup
+      await fs.unlink(tempFilePath).catch(() => { }); // Ignore errors in cleanup
     }
   }
 
@@ -273,33 +258,40 @@ export class JobService {
     }
     if (this.userId) {
       let pdfPages = job.num_pages || 0;
-      const pageCredits = await this.pageCreditRepository.getRemainingPageCredits(
-        this.userId as string
-      );
-      // sort based on expires_at
-      pageCredits.sort(
-        (a, b) =>
-          new Date(a.expires_at as string).getTime() - new Date(b.expires_at as string).getTime()
-      );
-      const negativePageCredits: IPageCredit[] = [];
-      for (const credit of pageCredits) {
-        if (pdfPages <= 0) {
-          break;
+      const pageCreditsCount = await this.pageCreditRepository.getPageCreditsCountByJobId(job.id);
+      console.log('>>> pageCreditsCount', pageCreditsCount);
+      if (pageCreditsCount > 0) {
+        logger.info("Job has already been charged for, skipping page credit deduction");
+      } else {
+        const pageCredits = await this.pageCreditRepository.getRemainingPageCredits(
+          this.userId as string
+        );
+        // sort based on expires_at
+        pageCredits.sort(
+          (a, b) =>
+            new Date(a.expires_at as string).getTime() - new Date(b.expires_at as string).getTime()
+        );
+        const negativePageCredits: IPageCredit[] = [];
+        for (const credit of pageCredits) {
+          if (pdfPages <= 0) {
+            break;
+          }
+          const balanceToDeduct = Math.min(credit.balance, pdfPages);
+          pdfPages -= balanceToDeduct;
+          negativePageCredits.push({
+            reference_id: credit.reference_id,
+            source_type: credit.source_type,
+            expires_at: credit.expires_at,
+            change: -balanceToDeduct,
+            reason: 'DOWNLOAD',
+            job_id: jobId,
+            id: uuidv4(),
+            user_id: this.userId as string,
+            created_at: new Date().toISOString(),
+          });
         }
-        const balanceToDeduct = Math.min(credit.balance, pdfPages);
-        pdfPages -= balanceToDeduct;
-        negativePageCredits.push({
-          reference_id: credit.reference_id,
-          source_type: credit.source_type,
-          expires_at: credit.expires_at,
-          change: -balanceToDeduct,
-          reason: 'DOWNLOAD',
-          id: uuidv4(),
-          user_id: this.userId as string,
-          created_at: new Date().toISOString(),
-        });
+        await this.pageCreditRepository.createPageCredits(negativePageCredits);
       }
-      await this.pageCreditRepository.createPageCredits(negativePageCredits);
     }
 
     // Check if job is completed
