@@ -98,7 +98,7 @@ class SaveFormat(BaseStep):
             job_data={},
             is_logged_in=is_logged_in
         )
-        job_data.update_job_status(job_id, JobStatus.SUCCESS, result_s3_path=result_s3_path, additional_fields={**download_s3_paths}, num_pages=num_pages)
+        job_data.update_job_status(job_id, JobStatus.SUCCESS, result_s3_path=result_s3_path, download_data={**download_s3_paths}, num_pages=num_pages)
 
     def run(self):
         context = self.context or {}

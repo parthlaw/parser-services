@@ -9,4 +9,5 @@ export interface IPageCreditRepository {
   createPageCredits(input: ICreatePageCreditInput[]): Promise<IPageCredit[]>;
   getRemainingPageCredits(userId: string): Promise<IPageCreditBalance[]>;
   getPageCreditsCountByJobId(jobId: string): Promise<number>;
+  getPageCreditByReferenceId(referenceId: string): Promise<IPageCredit | null>;
 }

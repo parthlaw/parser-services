@@ -14,7 +14,7 @@ export const generateHostedCheckout = asyncHandler(
     const paymentService = getPaymentService(req);
     const priceId = req.query.priceId as string;
     const purchaseType = req.query.purchaseType as PurchaseType;
-    const hostedCheckout = await paymentService.generateHostedCheckout(
+    const hostedCheckout = await paymentService.generateHostedCheckoutPage(
       [{ item_price_id: priceId }],
       purchaseType
     );

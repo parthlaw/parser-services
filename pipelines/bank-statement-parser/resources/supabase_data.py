@@ -74,7 +74,9 @@ class SupabaseData(JobData):
         result_s3_path: Optional[str] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
         num_pages: Optional[int] = None,
-        result_score: Optional[float] = None
+        result_score: Optional[float] = None,
+        download_data: Optional[Dict[str, Any]] = None,
+        failure_reason: Optional[str] = None
     ) -> Dict[str, Any]:
         """Update the status of an existing job in Supabase."""
         try:
@@ -91,6 +93,12 @@ class SupabaseData(JobData):
                 
             if result_score is not None:
                 update_data["result_score"] = result_score
+                
+            if download_data is not None:
+                update_data["download_data"] = download_data
+
+            if failure_reason is not None:
+                update_data["failure_reason"] = failure_reason
                 
             # Handle metadata updates
             if additional_fields:
@@ -116,109 +124,25 @@ class SupabaseData(JobData):
             logger.error(f"Error updating job {job_id}: {str(e)}")
             raise
 
-    def create_job_steps(self, job_id: str, pipeline_steps: List[Dict[str, Any]]) -> bool:
-        """Create step tracking records for a job's pipeline in Supabase."""
-        try:
-            step_records = []
-            for i, step in enumerate(pipeline_steps):
-                step_record = {
-                    "job_id": job_id,
-                    "step_name": step.get('id', step.get('key', f"step_{i}")),
-                    "step_order": i + 1,
-                    "status": "pending",
-                    "step_config": step  # Store the full step configuration
-                }
-                step_records.append(step_record)
-            
-            # Insert all step records
-            result = self.supabase.insert("job_steps", step_records)
-            
-            if result:
-                logger.info(f"Created {len(step_records)} step records for job {job_id}")
-                return True
-            else:
-                logger.error(f"Failed to create step records for job {job_id}")
-                return False
-                
-        except Exception as e:
-            logger.error(f"Error creating job steps for {job_id}: {str(e)}")
-            return False
-
-    def update_step_status(
-        self,
-        job_id: str,
-        step_name: str,
-        status: str,
-        s3_output_path: Optional[str] = None,
-        execution_time_ms: Optional[int] = None,
-        error_details: Optional[Dict[str, Any]] = None
-    ) -> bool:
-        """Update the status of a specific pipeline step in Supabase."""
-        try:
-            update_data = {
-                "status": status,
-                "updated_at": datetime.utcnow().isoformat() + 'Z'
-            }
-            
-            if s3_output_path:
-                update_data["s3_output_path"] = s3_output_path
-            if execution_time_ms is not None:
-                update_data["execution_time_ms"] = execution_time_ms
-            if error_details:
-                update_data["error_details"] = error_details
-            
-            filters = {
-                "job_id": f"eq.{job_id}",
-                "step_name": f"eq.{step_name}"
-            }
-            
-            result = self.supabase.update("job_steps", update_data, filters)
-            
-            if result:
-                logger.info(f"Updated step {step_name} status to {status} for job {job_id}")
-                return True
-            else:
-                logger.warning(f"No step found to update: {step_name} for job {job_id}")
-                return False
-                
-        except Exception as e:
-            logger.error(f"Error updating step status: {str(e)}")
-            return False
-
     def get_job_progress(self, job_id: str) -> Dict[str, Any]:
-        """Get the current progress of a job's pipeline steps from Supabase."""
+        """Get job progress from Supabase."""
         try:
-            filters = {"job_id": f"eq.{job_id}"}
-            steps = self.supabase.select(
-                "job_steps", 
-                filters=filters,
-                order="step_order.asc"
-            )
+            current_job = self.get_job(job_id)
+            if not current_job:
+                return {"progress_percent": 0, "status": "not_found"}
             
-            if not steps:
-                return {"total_steps": 0, "completed_steps": 0, "current_step": None, "progress_percent": 0}
+            job_status = current_job.get('status', 'pending')
             
-            total_steps = len(steps)
-            completed_steps = len([s for s in steps if s['status'] in ["completed", "skipped"]])
-            current_step = None
-            
-            # Find current step (first non-completed step)
-            for step in steps:
-                if step['status'] == "processing":
-                    current_step = step['step_name']
-                    break
-                elif step['status'] == "pending":
-                    current_step = step['step_name']
-                    break
-            
-            progress_percent = int((completed_steps / total_steps) * 100) if total_steps > 0 else 0
+            if job_status == 'success':
+                progress_percent = 100
+            elif job_status == 'processing':
+                progress_percent = 50  # Rough estimate
+            else:
+                progress_percent = 0
             
             return {
-                "total_steps": total_steps,
-                "completed_steps": completed_steps,
-                "current_step": current_step,
                 "progress_percent": progress_percent,
-                "steps": steps
+                "status": job_status
             }
             
         except Exception as e:

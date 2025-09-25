@@ -127,4 +127,22 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
       throw error;
     }
   }
+
+  async getSubscriptionByExternalId(subscriptionId: string): Promise<ISubscription | null> {
+    const { data, error } = await this.supabase
+      .from('subscriptions')
+      .select()
+      .eq('subscription_id', subscriptionId)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        // Record not found
+        return null;
+      }
+      throw error;
+    }
+
+    return data as ISubscription;
+  }
 }

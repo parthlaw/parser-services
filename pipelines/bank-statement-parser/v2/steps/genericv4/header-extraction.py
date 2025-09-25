@@ -3,6 +3,7 @@ from collections import defaultdict
 import re
 
 from v2.base_step import BaseStep
+from v2.exceptions import UserFacingError, ErrorMessages
 
 class HeaderExtraction(BaseStep):
     def __init__(self, context=None, input=None) -> None:
@@ -486,4 +487,4 @@ class HeaderExtraction(BaseStep):
             return
         
         if total_words == 0:
-            raise Exception("PDF is likely image-based - no extractable text found")
+            raise UserFacingError(ErrorMessages.PDF_IMAGE_BASED.value)

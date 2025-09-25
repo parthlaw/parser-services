@@ -17,6 +17,9 @@ export interface IJob {
   num_pages: number | undefined;
   created_at: string;
   updated_at: string;
+  credits_spent?: number;
+  failure_reason?: string;
+  download_data?: Record<string, any>;
 }
 
 export interface ICreateJobInput {
@@ -32,6 +35,9 @@ export interface IUpdateJobInput {
   result_s3_path?: string;
   result_score?: number;
   num_pages?: number;
+  credits_spent?: number;
+  failure_reason?: string;
+  download_data?: Record<string, any>;
 }
 export interface IJsonlPaginationOptions {
   offset: number;
@@ -235,9 +241,6 @@ export interface IJobListPagination {
 export interface IJobListResponse {
   jobs: IJobListItem[];
   total: number;
-  completed: number;
-  failed: number;
-  processing: number;
   pagination: IJobListPagination;
 }
 

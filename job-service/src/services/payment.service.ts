@@ -7,19 +7,17 @@ import {
 } from '@/resources/chargebee/operations';
 import { User } from '@supabase/supabase-js';
 import { IUserGatewayIdRepository } from '@/repositories/user-gateway-id.repository';
-// import { IBundleRepository } from "@/repositories/bundle.repository";
 import { ISubscriptionRepository } from '@/repositories/subscription.repository';
 import { IPageCreditRepository } from '@/repositories/page-credit.repository';
 import { IBundle, IPageCredit, ISubscription } from '@/types/models';
 import { v4 as uuidv4 } from 'uuid';
 import { SupabaseUserGatewayIdRepository } from '@/repositories/supabase.user-gateway-id.repository';
-// import { SupabaseBundleRepository } from "@/repositories/supabase.bundle.repository";
 import { SupabaseSubscriptionRepository } from '@/repositories/supabase.subscription.repository';
 import { SupabasePageCreditRepository } from '@/repositories/supabase.page-credit.repository';
 import itemPriceMapping from '@/lib/item-price-mapping.json';
-// import { BadRequestError } from "@/utils/errors";
 import { IBundleRepository } from '@/repositories/bundle.repository';
 import { SupabaseBundleRepository } from '@/repositories/supabase.bundle.repository';
+import fs from 'fs';
 export class PaymentService {
   private user: User;
   private userGatewayIdRepository: IUserGatewayIdRepository;
@@ -66,13 +64,14 @@ export class PaymentService {
   private async updateSubscription(subscription: ISubscription) {
     return await this.subscriptionRepository.updateSubscription(subscription);
   }
-  async generateHostedCheckout(
+  async generateHostedCheckoutPage(
     subscriptionItems: ChargebeeItemPrice[],
     purchaseType: PurchaseType
   ) {
     const firstName = this.user.user_metadata?.name?.split(' ')[0];
     const lastName = this.user.user_metadata?.name?.split(' ')[1];
     const userGatewayId = await this.getUserGatewayId(this.user.id);
+    console.log(">>> USER GATEWAY ID", userGatewayId);
     if (purchaseType === PurchaseType.SUBSCRIPTION) {
       const existingSubscription = await this.getSubscription(this.user.id);
       if (existingSubscription) {
@@ -102,10 +101,6 @@ export class PaymentService {
         ...(userGatewayId && { id: userGatewayId.gateway_user_id }),
       });
     }
-  }
-  private calculateSubscriptionEndDate(startTimestamp: number): string {
-    const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-    return new Date(new Date(startTimestamp * 1000).getTime() + THIRTY_DAYS_MS).toISOString();
   }
 
   private async handleUserGatewayId(customerId: string): Promise<void> {
@@ -147,12 +142,12 @@ export class PaymentService {
         subscription.subscription_items?.[0]?.item_price_id as keyof typeof itemPriceMapping
       ]?.pages;
     const pageCreditDifference = newPages - existingPages;
-    const endDate = this.calculateSubscriptionEndDate(subscription.started_at as number);
+    const endDate = new Date((subscription.current_term_end as number)*1000).toISOString();
 
     await this.updateSubscription({
       id: existingSubscription.id,
       status: subscription.status as string,
-      start_date: new Date(subscription.started_at as number).toISOString(),
+      start_date: new Date((subscription.current_term_start as number)*1000).toISOString(),
       end_date: endDate,
       subscription_id: subscription.id as string,
       item_price_id: subscription.subscription_items?.[0]?.item_price_id as string,
@@ -176,13 +171,12 @@ export class PaymentService {
     dbSubscriptionId: string,
     pageCredits: IPageCredit[]
   ): Promise<void> {
-    const endDate = this.calculateSubscriptionEndDate(subscription.started_at as number);
-
+    const endDate = new Date((subscription.current_term_end as number)*1000).toISOString();
     await this.createSubscription({
       id: dbSubscriptionId,
       user_id: this.user.id,
       currency: subscription.currency_code as string,
-      start_date: new Date(subscription.started_at as number).toISOString(),
+      start_date: new Date((subscription.current_term_start as number)*1000).toISOString(),
       end_date: endDate,
       subscription_id: subscription.id as string,
       item_price_id: subscription.subscription_items?.[0]?.item_price_id as string,
@@ -246,12 +240,12 @@ export class PaymentService {
 
   async successCallbackHandler(hostedCheckoutId: string) {
     const hostedCheckout = await getHostedCheckout(hostedCheckoutId);
-    const customer = hostedCheckout?.content?.customer;
+    const customer = hostedCheckout?.content?.customer || hostedCheckout?.content?.invoice?.customer_id;
     const subscription = hostedCheckout?.content?.subscription;
     const type = hostedCheckout.type;
     const pageCredits: IPageCredit[] = [];
     const dbBundleId = uuidv4();
-
+    fs.writeFileSync('hostedCheckout.json', JSON.stringify(hostedCheckout, null, 2));
     if (subscription) {
       await this.handleSubscriptionFlow(subscription, pageCredits);
     }

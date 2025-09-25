@@ -1,5 +1,5 @@
 import { DynamoDBOperations } from '@/resources/dynamodb/operations';
-import { IJob, ICreateJobInput, JobStatus } from '@/types/models';
+import { IJob, ICreateJobInput, JobStatus, IUpdateJobInput } from '@/types/models';
 import { IJobRepository, JobCounts } from './job.repository';
 
 export class DynamoDBJobRepository implements IJobRepository {
@@ -38,8 +38,11 @@ export class DynamoDBJobRepository implements IJobRepository {
     });
   }
 
-  async getJobs(_userId: string): Promise<IJob[] | null> {
-    return [];
+  async getJobs(_userId: string, _offset: number, _limit: number): Promise<{ data: IJob[], total: number } | null> {
+    return {
+      data: [],
+      total: 0,
+    };
   }
   async getJobCounts(_userId: string): Promise<JobCounts> {
     return {
@@ -47,5 +50,9 @@ export class DynamoDBJobRepository implements IJobRepository {
       completed: 0,
       failed: 0,
     };
+  }
+  async updateJob(_id: string, _input: IUpdateJobInput): Promise<IJob> {
+    // no-op for DynamoDB
+    return null as unknown as IJob;
   }
 }

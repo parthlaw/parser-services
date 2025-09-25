@@ -113,14 +113,13 @@ export class JobService {
     const offset = (page - 1) * limit;
 
     // Get jobs with pagination
-    const jobs = await this.jobRepository.getJobs(this.userId as string, offset, limit);
+    const result = await this.jobRepository.getJobs(this.userId as string, offset, limit);
+    const jobs = result?.data || [];
+    const total = result?.total || 0;
     if (!jobs) {
       return {
         jobs: [],
         total: 0,
-        completed: 0,
-        failed: 0,
-        processing: 0,
         pagination: {
           page,
           limit,
@@ -132,13 +131,7 @@ export class JobService {
       };
     }
 
-    // Calculate status counts
-    const completed = jobs.filter((job) => job.status === JobStatus.SUCCESS).length;
-    const failed = jobs.filter((job) => job.status === JobStatus.FAILED).length;
-    const processing = jobs.filter((job) => job.status === JobStatus.PROCESSING).length;
-
     // Apply pagination
-    const total = jobs.length;
     const totalPages = Math.ceil(total / limit);
     // Process jobs to ensure filename is populated
     const processedJobs: IJobListItem[] = jobs.map((job) => ({
@@ -147,14 +140,14 @@ export class JobService {
       status: job.status,
       created_at: job.created_at,
       updated_at: job.updated_at,
+      credits_spent: job.credits_spent,
+      failure_reason: job.failure_reason,
+      download_data: job.download_data,
     }));
 
     return {
       jobs: processedJobs,
       total,
-      completed,
-      failed,
-      processing,
       pagination: {
         page,
         limit,
@@ -290,6 +283,10 @@ export class JobService {
             created_at: new Date().toISOString(),
           });
         }
+        await this.jobRepository.updateJob(jobId,{
+          credits_spent: negativePageCredits.reduce((acc, credit) => acc + credit.change, 0),
+          id: jobId,
+        })
         await this.pageCreditRepository.createPageCredits(negativePageCredits);
       }
     }

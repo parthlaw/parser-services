@@ -1,4 +1,5 @@
 from v2.base_step import BaseStep
+from v2.exceptions import UserFacingError, ErrorMessages
 
 
 class BuildColumnGroups(BaseStep):
@@ -70,7 +71,7 @@ class BuildColumnGroups(BaseStep):
             break
         
         if not headers_data:
-            raise ValueError("No headers data found")
+            raise UserFacingError(ErrorMessages.HEADERS_NOT_FOUND.value)
         
         headers = headers_data["headers"]
         

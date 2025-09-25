@@ -3,6 +3,7 @@ import gc
 
 from v2.base_step import BaseStep
 import re
+from v2.exceptions import UserFacingError, ErrorMessages
 
 
 class CleanData(BaseStep):
@@ -121,7 +122,7 @@ class CleanData(BaseStep):
             break  # Headers step produces single result
         
         if not headers_data:
-            raise ValueError("No headers data found")
+            raise UserFacingError(ErrorMessages.HEADERS_NOT_FOUND.value)
         
         headers = headers_data["headers"]
         source_page = headers_data["source_page"]

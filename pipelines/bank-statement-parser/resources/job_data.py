@@ -47,34 +47,36 @@ class JobData(ABC):
         result_s3_path: Optional[str] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
         num_pages: Optional[int] = None,
-        result_score: Optional[float] = None
+        result_score: Optional[float] = None,
+        download_data: Optional[Dict[str, Any]] = None,
+        failure_reason: Optional[str] = None
     ) -> Dict[str, Any]:
         """Update the status of an existing job."""
         pass
 
-    # Job Step Management Methods (may be no-op for backends without step support)
-    @abstractmethod
-    def create_job_steps(self, job_id: str, pipeline_steps: List[Dict[str, Any]]) -> bool:
-        """Create step tracking records for a job's pipeline."""
-        pass
-
-    @abstractmethod
-    def update_step_status(
-        self,
-        job_id: str,
-        step_name: str,
-        status: str,
-        s3_output_path: Optional[str] = None,
-        execution_time_ms: Optional[int] = None,
-        error_details: Optional[Dict[str, Any]] = None
-    ) -> bool:
-        """Update the status of a specific pipeline step."""
-        pass
-
-    @abstractmethod
     def get_job_progress(self, job_id: str) -> Dict[str, Any]:
-        """Get the current progress of a job's pipeline steps."""
-        pass
+        """Get the current progress of a job.
+        
+        Note: This is now simplified to just return job-level status since we no longer track individual steps.
+        """
+        job = self.get_job(job_id)
+        if not job:
+            return {"progress_percent": 0, "status": "not_found"}
+            
+        status = job.get('status', 'pending')
+        if status == 'success':
+            progress = 100
+        elif status == 'failed':
+            progress = 0
+        elif status == 'processing':
+            progress = 50
+        else:
+            progress = 0
+            
+        return {
+            "progress_percent": progress,
+            "status": status
+        }
 
     # User Job Queries
     @abstractmethod

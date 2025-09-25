@@ -5,7 +5,8 @@ import pdfplumber
 import importlib
 from io import BytesIO
 
-from resources.job_data_factory import create_job_data_instance, JobStatus, StepStatus
+from resources.job_data_factory import create_job_data_instance, JobStatus
+from .exceptions import UserFacingError, ErrorMessages
 from utils import constants, s3_utils
 from utils.jsonl_utils import JSONLManager
 from utils.logger import get_logger
@@ -112,9 +113,8 @@ class BankStatementParser:
             # Update step outputs
             step_outputs[step_key] = s3_output_key
             
-            # Update step status
-            if self.user_id:
-                self.job_data.update_step_status(self.job_id, step_name, StepStatus.COMPLETED, s3_output_path=s3_output_key)
+            # Step completed successfully
+            self.logger.info(f"Step {step_name} completed", s3_output_key=s3_output_key)
             
             self.logger.log_step_end(step_name, 
                                     job_id=self.job_id, 
@@ -125,6 +125,12 @@ class BankStatementParser:
         except Exception as e:
             self.logger.log_step_error(step_name, e, self.job_id, self.user_id, 
                                       step_file=step_file)
+            # Determine user-facing error message
+            if isinstance(e, UserFacingError):
+                failure_reason = e.user_message
+            else:
+                failure_reason = ErrorMessages.UNKNOWN_ERROR.value
+
             error_details = {
                 "error_message": str(e),
                 "error_type": type(e).__name__,
@@ -132,11 +138,12 @@ class BankStatementParser:
             }
             
             if self.user_id:
-                # Update step status (no-op for DynamoDB, tracked for Supabase)
-                self.job_data.update_step_status(self.job_id, step_name, StepStatus.FAILED, error_details=error_details)
-                # Update job status
-                self.job_data.update_job_status(self.job_id, JobStatus.FAILED, 
-                                additional_fields={"failed_step": step_name, "error_details": error_details})
+                # Update job status with error details and user-facing message
+                self.job_data.update_job_status(
+                    self.job_id, 
+                    JobStatus.FAILED,
+                    additional_fields={"failed_step": step_name, "error_details": error_details},
+                    failure_reason=failure_reason)
             raise
 
     def run(self, file_path: Optional[str] = None):
@@ -158,7 +165,15 @@ class BankStatementParser:
             # Load PDF and setup context
             pdf_bytes = s3_utils.get_pdf_from_s3(constants.BUCKET_NAME, self.source_key)
             pdf_stream = BytesIO(pdf_bytes)
-            pdf_doc = pdfplumber.open(pdf_stream)
+            try:
+                pdf_doc = pdfplumber.open(pdf_stream)
+            except Exception as e:
+                # Check if error message indicates PDF is encrypted/password protected
+                error_msg = str(e).lower()
+                if any(keyword in error_msg for keyword in ['password', 'decrypt', 'encrypted']):
+                    raise UserFacingError(ErrorMessages.PDF_LOCKED.value)
+                # For other PDF-related errors, raise as unreadable
+                raise UserFacingError(ErrorMessages.PDF_UNREADABLE.value)
             
             # Create a limited PDF wrapper to only process first 2 pages
             class LimitedPDF:
@@ -195,6 +210,26 @@ class BankStatementParser:
             
         except Exception as e:
             self.logger.error("Pipeline execution failed", exc_info=True)
+            
+            # Determine user-facing error message
+            if isinstance(e, UserFacingError):
+                failure_reason = e.user_message
+            else:
+                failure_reason = ErrorMessages.UNKNOWN_ERROR.value
+
+            error_details = {
+                "error_message": str(e),
+                "error_type": type(e).__name__,
+                "step": "pipeline_execution"  # Indicates failure at pipeline level
+            }
+            
+            if self.user_id:
+                self.job_data.update_job_status(
+                    self.job_id,
+                    JobStatus.FAILED,
+                    additional_fields={"error_details": error_details},
+                    failure_reason=failure_reason
+                )
             raise
         finally:
             # Clean up PDF resources

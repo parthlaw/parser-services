@@ -7,4 +7,5 @@ export interface ISubscriptionRepository {
   getActiveSubscriptions(userId: string): Promise<ISubscription[]>;
   updateSubscription(input: IUpdateSubscriptionInput): Promise<ISubscription>;
   deleteSubscription(id: string, userId: string): Promise<void>;
+  getSubscriptionByExternalId(subscriptionId: string): Promise<ISubscription | null>;
 }

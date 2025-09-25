@@ -31,10 +31,3 @@ class JobStatus:
     FAILED = "failed"
 
 
-class StepStatus:
-    """Pipeline step status constants."""
-    PENDING = "pending"
-    PROCESSING = "processing"
-    COMPLETED = "completed"
-    SKIPPED = "skipped"
-    FAILED = "failed"

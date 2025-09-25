@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { IJob, ICreateJobInput, JobStatus } from '@/types/models';
+import { IJob, ICreateJobInput, JobStatus, IUpdateJobInput } from '@/types/models';
 import { IJobRepository, JobCounts } from './job.repository';
 import envConfig from '@/config/environment';
 
@@ -36,6 +36,20 @@ export class SupabaseJobRepository implements IJobRepository {
 
     return data as IJob;
   }
+  async updateJob(id: string, input: IUpdateJobInput): Promise<IJob> {
+    const { data, error } = await this.supabase
+      .from('jobs')
+      .update(input)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return data as IJob;
+  }
   async getJob(id: string, userId: string): Promise<IJob | null> {
     const { data, error } = await this.supabase
       .from('jobs')
@@ -55,10 +69,10 @@ export class SupabaseJobRepository implements IJobRepository {
     return data as IJob;
   }
 
-  async getJobs(userId: string, offset: number, limit: number): Promise<IJob[] | null> {
-    const { data, error } = await this.supabase
+  async getJobs(userId: string, offset: number, limit: number): Promise<{ data: IJob[], total: number } | null> {
+    const { data, error,count } = await this.supabase
       .from('jobs')
-      .select()
+      .select("*", { count: 'exact' })
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
@@ -71,7 +85,10 @@ export class SupabaseJobRepository implements IJobRepository {
       throw error;
     }
 
-    return data as IJob[];
+    return {
+      data: data as IJob[],
+      total: count || data.length,
+    };
   }
 
   async getJobCounts(userId: string): Promise<JobCounts> {

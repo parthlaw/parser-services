@@ -95,7 +95,9 @@ class DynamoData(JobData):
         result_s3_path: Optional[str] = None,
         additional_fields: Optional[Dict[str, Any]] = None,
         num_pages: Optional[int] = None,
-        result_score: Optional[float] = None
+        result_score: Optional[float] = None,
+        download_data: Optional[Dict[str, Any]] = None,
+        failure_reason: Optional[str] = None
     ) -> Dict[str, Any]:
         """Update the status of an existing job in DynamoDB."""
         try:
@@ -123,6 +125,14 @@ class DynamoData(JobData):
                 if isinstance(result_score, float):
                     result_score = Decimal(str(result_score))
                 expression_attribute_values[":result_score"] = result_score
+                
+            if download_data is not None:
+                update_expression += ", download_data = :download_data"
+                expression_attribute_values[":download_data"] = download_data
+
+            if failure_reason is not None:
+                update_expression += ", failure_reason = :failure_reason"
+                expression_attribute_values[":failure_reason"] = failure_reason
                 
             # Handle metadata updates
             if additional_fields:
@@ -157,32 +167,13 @@ class DynamoData(JobData):
             logger.error(f"Error updating job {job_id} in DynamoDB: {str(e)}")
             raise
 
-    def create_job_steps(self, job_id: str, pipeline_steps: List[Dict[str, Any]]) -> bool:
-        """No-op for DynamoDB - we don't track individual steps, only job status."""
-        logger.info(f"DynamoDB: Skipping step creation for job {job_id} (only job-level tracking)")
-        return True
-
-    def update_step_status(
-        self,
-        job_id: str,
-        step_name: str,
-        status: str,
-        s3_output_path: Optional[str] = None,
-        execution_time_ms: Optional[int] = None,
-        error_details: Optional[Dict[str, Any]] = None
-    ) -> bool:
-        """No-op for DynamoDB - we don't track individual steps, only job status."""
-        logger.debug(f"DynamoDB: Skipping step update for {step_name} in job {job_id} (only job-level tracking)")
-        return True
-
     def get_job_progress(self, job_id: str) -> Dict[str, Any]:
-        """DynamoDB doesn't track individual steps - return job-level progress only."""
+        """Get job progress from DynamoDB."""
         try:
             current_job = self.get_job(job_id)
             if not current_job:
-                return {"total_steps": 0, "completed_steps": 0, "current_step": None, "progress_percent": 0}
+                return {"progress_percent": 0, "status": "not_found"}
             
-            # For DynamoDB, we only track job status, not individual steps
             job_status = current_job.get('status', 'pending')
             
             if job_status == 'success':
@@ -193,11 +184,8 @@ class DynamoData(JobData):
                 progress_percent = 0
             
             return {
-                "total_steps": 1,  # Just the overall job
-                "completed_steps": 1 if job_status == 'success' else 0,
-                "current_step": "processing" if job_status == 'processing' else None,
                 "progress_percent": progress_percent,
-                "job_status": job_status
+                "status": job_status
             }
             
         except Exception as e:

@@ -3,6 +3,7 @@ import math
 from typing import Tuple
 import gc
 from v2.base_step import BaseStep
+from v2.exceptions import UserFacingError, ErrorMessages
 
 class ExtractColumnRange(BaseStep):
     def __init__(self, context=None, input=None) -> None:
@@ -263,7 +264,7 @@ class ExtractColumnRange(BaseStep):
             break  # Headers step produces single result
         
         if not headers_data:
-            raise ValueError("No headers data found")
+            raise UserFacingError(ErrorMessages.HEADERS_NOT_FOUND.value)
         
         headers = headers_data["headers"]
         previous_column_range = None

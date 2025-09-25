@@ -50,6 +50,7 @@ export const generateHostedCheckout = async (
         phone: customer.phone,
         company: customer.company || '',
         ...(customer.cf_user_id && { cf_user_id: customer.cf_user_id }),
+        ...(customer.id && { id: customer.id }),
       } as any,
     });
     return result.hosted_page;
@@ -73,6 +74,7 @@ export const generateHostedCheckoutOneTime = async (
       phone: customer.phone,
       company: customer.company || '',
       ...(customer.cf_user_id && { cf_user_id: customer.cf_user_id }),
+      ...(customer.id && { id: customer.id }),
     } as any,
   });
   return result.hosted_page;

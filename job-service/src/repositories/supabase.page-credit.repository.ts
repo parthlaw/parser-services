@@ -83,4 +83,11 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
     return count;
   }
 
+  async getPageCreditByReferenceId(referenceId: string): Promise<IPageCredit | null> {
+    const { data, error } = await this.supabase.from('page_credits').select().eq('reference_id', referenceId).single();
+    if (error) {
+      return null;
+    }
+    return data as IPageCredit;
+  }
 }

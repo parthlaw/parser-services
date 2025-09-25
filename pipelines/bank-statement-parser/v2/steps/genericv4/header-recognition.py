@@ -2,6 +2,7 @@ from v2.base_step import BaseStep
 import re
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
+from v2.exceptions import UserFacingError, ErrorMessages
 
 
 class HeaderRecognition(BaseStep):
@@ -69,7 +70,7 @@ class HeaderRecognition(BaseStep):
             break  # Headers step produces single result
         
         if not headers_data:
-            raise ValueError("No headers data found")
+            raise UserFacingError(ErrorMessages.HEADERS_NOT_FOUND.value)
         
         headers = headers_data["headers"]
         
