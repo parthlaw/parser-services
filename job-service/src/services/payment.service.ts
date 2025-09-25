@@ -71,7 +71,7 @@ export class PaymentService {
     const firstName = this.user.user_metadata?.name?.split(' ')[0];
     const lastName = this.user.user_metadata?.name?.split(' ')[1];
     const userGatewayId = await this.getUserGatewayId(this.user.id);
-    console.log(">>> USER GATEWAY ID", userGatewayId);
+    console.log('>>> USER GATEWAY ID', userGatewayId);
     if (purchaseType === PurchaseType.SUBSCRIPTION) {
       const existingSubscription = await this.getSubscription(this.user.id);
       if (existingSubscription) {
@@ -142,12 +142,12 @@ export class PaymentService {
         subscription.subscription_items?.[0]?.item_price_id as keyof typeof itemPriceMapping
       ]?.pages;
     const pageCreditDifference = newPages - existingPages;
-    const endDate = new Date((subscription.current_term_end as number)*1000).toISOString();
+    const endDate = new Date((subscription.current_term_end as number) * 1000).toISOString();
 
     await this.updateSubscription({
       id: existingSubscription.id,
       status: subscription.status as string,
-      start_date: new Date((subscription.current_term_start as number)*1000).toISOString(),
+      start_date: new Date((subscription.current_term_start as number) * 1000).toISOString(),
       end_date: endDate,
       subscription_id: subscription.id as string,
       item_price_id: subscription.subscription_items?.[0]?.item_price_id as string,
@@ -171,12 +171,12 @@ export class PaymentService {
     dbSubscriptionId: string,
     pageCredits: IPageCredit[]
   ): Promise<void> {
-    const endDate = new Date((subscription.current_term_end as number)*1000).toISOString();
+    const endDate = new Date((subscription.current_term_end as number) * 1000).toISOString();
     await this.createSubscription({
       id: dbSubscriptionId,
       user_id: this.user.id,
       currency: subscription.currency_code as string,
-      start_date: new Date((subscription.current_term_start as number)*1000).toISOString(),
+      start_date: new Date((subscription.current_term_start as number) * 1000).toISOString(),
       end_date: endDate,
       subscription_id: subscription.id as string,
       item_price_id: subscription.subscription_items?.[0]?.item_price_id as string,
@@ -240,7 +240,8 @@ export class PaymentService {
 
   async successCallbackHandler(hostedCheckoutId: string) {
     const hostedCheckout = await getHostedCheckout(hostedCheckoutId);
-    const customer = hostedCheckout?.content?.customer || hostedCheckout?.content?.invoice?.customer_id;
+    const customer =
+      hostedCheckout?.content?.customer || hostedCheckout?.content?.invoice?.customer_id;
     const subscription = hostedCheckout?.content?.subscription;
     const type = hostedCheckout.type;
     const pageCredits: IPageCredit[] = [];

@@ -224,7 +224,7 @@ export class JobService {
     } finally {
       // Clean up the temp file
       const fs = await import('fs/promises');
-      await fs.unlink(tempFilePath).catch(() => { }); // Ignore errors in cleanup
+      await fs.unlink(tempFilePath).catch(() => {}); // Ignore errors in cleanup
     }
   }
 
@@ -254,7 +254,7 @@ export class JobService {
       const pageCreditsCount = await this.pageCreditRepository.getPageCreditsCountByJobId(job.id);
       console.log('>>> pageCreditsCount', pageCreditsCount);
       if (pageCreditsCount > 0) {
-        logger.info("Job has already been charged for, skipping page credit deduction");
+        logger.info('Job has already been charged for, skipping page credit deduction');
       } else {
         const pageCredits = await this.pageCreditRepository.getRemainingPageCredits(
           this.userId as string
@@ -283,10 +283,10 @@ export class JobService {
             created_at: new Date().toISOString(),
           });
         }
-        await this.jobRepository.updateJob(jobId,{
+        await this.jobRepository.updateJob(jobId, {
           credits_spent: negativePageCredits.reduce((acc, credit) => acc + credit.change, 0),
           id: jobId,
-        })
+        });
         await this.pageCreditRepository.createPageCredits(negativePageCredits);
       }
     }

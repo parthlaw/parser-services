@@ -73,18 +73,26 @@ export class SupabasePageCreditRepository implements IPageCreditRepository {
   }
 
   async getPageCreditsCountByJobId(jobId: string): Promise<number> {
-    const { error,count } = await this.supabase.from('page_credits').select('id', { count: 'exact' }).eq('job_id', jobId).limit(1);
+    const { error, count } = await this.supabase
+      .from('page_credits')
+      .select('id', { count: 'exact' })
+      .eq('job_id', jobId)
+      .limit(1);
     if (error) {
       throw error;
     }
-    if(count==null || count==undefined) {
+    if (count == null || count == undefined) {
       return 1;
     }
     return count;
   }
 
   async getPageCreditByReferenceId(referenceId: string): Promise<IPageCredit | null> {
-    const { data, error } = await this.supabase.from('page_credits').select().eq('reference_id', referenceId).single();
+    const { data, error } = await this.supabase
+      .from('page_credits')
+      .select()
+      .eq('reference_id', referenceId)
+      .single();
     if (error) {
       return null;
     }

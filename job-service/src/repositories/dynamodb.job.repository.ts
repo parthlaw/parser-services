@@ -38,7 +38,11 @@ export class DynamoDBJobRepository implements IJobRepository {
     });
   }
 
-  async getJobs(_userId: string, _offset: number, _limit: number): Promise<{ data: IJob[], total: number } | null> {
+  async getJobs(
+    _userId: string,
+    _offset: number,
+    _limit: number
+  ): Promise<{ data: IJob[]; total: number } | null> {
     return {
       data: [],
       total: 0,

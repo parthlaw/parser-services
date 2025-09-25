@@ -69,10 +69,14 @@ export class SupabaseJobRepository implements IJobRepository {
     return data as IJob;
   }
 
-  async getJobs(userId: string, offset: number, limit: number): Promise<{ data: IJob[], total: number } | null> {
-    const { data, error,count } = await this.supabase
+  async getJobs(
+    userId: string,
+    offset: number,
+    limit: number
+  ): Promise<{ data: IJob[]; total: number } | null> {
+    const { data, error, count } = await this.supabase
       .from('jobs')
-      .select("*", { count: 'exact' })
+      .select('*', { count: 'exact' })
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
