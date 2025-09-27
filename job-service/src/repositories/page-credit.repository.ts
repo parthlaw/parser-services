@@ -6,4 +6,5 @@ export interface IPageCreditRepository {
   getRemainingPageCredits(userId: string): Promise<IPageCreditBalance[]>;
   getPageCreditsCountByJobId(jobId: string): Promise<number>;
   getPageCreditByReferenceId(referenceId: string): Promise<IPageCredit | null>;
+  grantMonthlyFreeCredits(userId: string): Promise<IPageCredit[]>;
 }

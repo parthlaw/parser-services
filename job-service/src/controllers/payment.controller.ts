@@ -37,6 +37,9 @@ export const successCallbackHandler = asyncHandler(
 
 export const getSubscription = asyncHandler(async (req: Request, res: Response): Promise<void> => {
   const paymentService = getPaymentService(req);
-  const subscription = await paymentService.getSubscription(req.user?.id as string, true);
-  ApiResponseHandler.success(res, { subscription }, 'Subscription fetched successfully');
+  const allPromises = [];
+  allPromises.push(paymentService.getSubscription(req.user?.id as string, false));
+  allPromises.push(paymentService.getPageCredits(req.user?.id as string));
+  const [subscription, pageCredits] = await Promise.all(allPromises);
+  ApiResponseHandler.success(res, { subscription, pageCredits }, 'Subscription fetched successfully');
 });

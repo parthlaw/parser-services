@@ -16,10 +16,17 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
 
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
+  getTableName(): string {
+    const env = envConfig.STAGE;
+    if (env === 'dev') {
+      return 'user_gateway_id_dev';
+    }
+    return 'user_gateway_id';
+  }
 
   async createUserGatewayId(input: ICreateUserGatewayIdInput): Promise<IUserGatewayId> {
     const { data, error } = await this.supabase
-      .from('user_gateway_id')
+      .from(this.getTableName())
       .insert({
         user_id: input.user_id,
         gateway_user_id: input.gateway_user_id,
@@ -36,7 +43,7 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
 
   async getUserGatewayId(userId: string): Promise<IUserGatewayId | null> {
     const { data, error } = await this.supabase
-      .from('user_gateway_id')
+      .from(this.getTableName())
       .select()
       .eq('user_id', userId)
       .single();
@@ -54,7 +61,7 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
 
   async getUserGatewayIdsByUserId(userId: string): Promise<IUserGatewayId[]> {
     const { data, error } = await this.supabase
-      .from('user_gateway_id')
+      .from(this.getTableName())
       .select()
       .eq('user_id', userId);
 
@@ -67,7 +74,7 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
 
   async getUserGatewayIdsByGatewayUserId(gatewayUserId: string): Promise<IUserGatewayId | null> {
     const { data, error } = await this.supabase
-      .from('user_gateway_id')
+      .from(this.getTableName())
       .select()
       .eq('gateway_user_id', gatewayUserId)
       .single();
@@ -85,7 +92,7 @@ export class SupabaseUserGatewayIdRepository implements IUserGatewayIdRepository
 
   async deleteUserGatewayId(userId: string, gatewayUserId: string): Promise<void> {
     const { error } = await this.supabase
-      .from('user_gateway_id')
+      .from(this.getTableName())
       .delete()
       .eq('user_id', userId)
       .eq('gateway_user_id', gatewayUserId);

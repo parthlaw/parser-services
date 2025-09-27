@@ -21,7 +21,7 @@ import { downloadFileToDisk, getDownloadUrl, checkFileExists } from '@/resources
 import { getQueueUrl, sendMessage } from '@/resources/sqs/operations';
 import { BankStatementDecodeQueueMessage } from '@/types';
 import config from '@/config/environment';
-import { NotFoundError, ValidationError } from '@/utils/errors';
+import { InternalErrorCodes, NotFoundError, ValidationError } from '@/utils/errors';
 import { IPageCreditRepository } from '@/repositories/page-credit.repository';
 import { SupabasePageCreditRepository } from '@/repositories/supabase.page-credit.repository';
 import { v4 as uuidv4 } from 'uuid';
@@ -224,7 +224,7 @@ export class JobService {
     } finally {
       // Clean up the temp file
       const fs = await import('fs/promises');
-      await fs.unlink(tempFilePath).catch(() => {}); // Ignore errors in cleanup
+      await fs.unlink(tempFilePath).catch(() => { }); // Ignore errors in cleanup
     }
   }
 
@@ -250,20 +250,28 @@ export class JobService {
       throw new NotFoundError(`Job ${jobId} not found or you don't have permission to access it.`);
     }
     if (this.userId) {
+
       let pdfPages = job.num_pages || 0;
       const pageCreditsCount = await this.pageCreditRepository.getPageCreditsCountByJobId(job.id);
-      console.log('>>> pageCreditsCount', pageCreditsCount);
+
       if (pageCreditsCount > 0) {
         logger.info('Job has already been charged for, skipping page credit deduction');
       } else {
-        const pageCredits = await this.pageCreditRepository.getRemainingPageCredits(
-          this.userId as string
-        );
-        // sort based on expires_at
+        // Grant monthly free credits if needed
+        await this.pageCreditRepository.grantMonthlyFreeCredits(this.userId);
+
+        // Get available credits
+        const pageCredits = await this.pageCreditRepository.getRemainingPageCredits(this.userId);
+
+        // Sort based on expires_at
         pageCredits.sort(
           (a, b) =>
             new Date(a.expires_at as string).getTime() - new Date(b.expires_at as string).getTime()
         );
+        const totalPageCredits = pageCredits.reduce((acc, credit) => acc + credit.balance, 0);
+        if (totalPageCredits <= 0) {
+          throw new ValidationError(`Job ${jobId} has no page credits available.`, InternalErrorCodes.OVERUSE_LIMIT_EXCEEDED);
+        }
         const negativePageCredits: IPageCredit[] = [];
         for (const credit of pageCredits) {
           if (pdfPages <= 0) {
@@ -279,18 +287,29 @@ export class JobService {
             reason: 'DOWNLOAD',
             job_id: jobId,
             id: uuidv4(),
-            user_id: this.userId as string,
+            user_id: this.userId,
             created_at: new Date().toISOString(),
           });
         }
+        console.log(">>> PDF PAGES", pdfPages);
+        // Check if we've exceeded the overuse limit
+        if (pdfPages > config.OVERUSE_LIMIT) {
+          throw new ValidationError(`Job ${jobId} has exceeded the overuse limit.`, InternalErrorCodes.OVERUSE_LIMIT_EXCEEDED);
+        }
+        console.log(">>> NEGATIVE PAGE CREDITS", negativePageCredits);
+        // Update job and create negative credits
         await this.jobRepository.updateJob(jobId, {
-          credits_spent: negativePageCredits.reduce((acc, credit) => acc + credit.change, 0),
+          credits_spent: Math.abs(
+            negativePageCredits.reduce((acc, credit) => acc + credit.change, 0)
+          ),
           id: jobId,
         });
-        await this.pageCreditRepository.createPageCredits(negativePageCredits);
+        console.log(">>> NEGATIVE PAGE CREDITS", negativePageCredits);
+        if (negativePageCredits.length > 0) {
+          await this.pageCreditRepository.createPageCredits(negativePageCredits);
+        }
       }
     }
-
     // Check if job is completed
     if (job.status !== JobStatus.SUCCESS) {
       throw new ValidationError(`Job ${jobId} is not completed yet. Current status: ${job.status}`);

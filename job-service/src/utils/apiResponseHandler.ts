@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { InternalErrorCodes } from './errors';
 
 class ApiResponseHandler {
   static success(res: Response, data: any, message = 'Success', status = 200) {
@@ -32,10 +33,11 @@ class ApiResponseHandler {
     });
   }
 
-  static badRequest(res: Response, message = 'Bad request') {
+  static badRequest(res: Response, message = 'Bad request', errorCode: InternalErrorCodes = InternalErrorCodes.BAD_REQUEST_ERROR) {
     return res.status(400).json({
       success: false,
       message,
+      error: errorCode,
     });
   }
 

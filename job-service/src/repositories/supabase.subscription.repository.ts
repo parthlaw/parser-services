@@ -17,9 +17,16 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
+  getTableName(): string {
+    const env = envConfig.STAGE;
+    if (env === 'dev') {
+      return 'subscriptions_dev';
+    }
+    return 'subscriptions';
+  }
   async createSubscription(input: ICreateSubscriptionInput): Promise<ISubscription> {
     const { data, error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .insert({
         id: input.id,
         user_id: input.user_id,
@@ -42,7 +49,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
 
   async getSubscription(id: string, userId: string): Promise<ISubscription | null> {
     const { data, error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .select()
       .eq('id', id)
       .eq('user_id', userId)
@@ -61,7 +68,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
 
   async getSubscriptionsByUserId(userId: string): Promise<ISubscription[]> {
     const { data, error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .select()
       .eq('user_id', userId)
       .eq('status', 'active')
@@ -78,7 +85,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
     const now = new Date().toISOString();
 
     const { data, error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .select()
       .eq('user_id', userId)
       .lte('start_date', now)
@@ -103,7 +110,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
     if (input.status !== undefined) updateData.status = input.status;
 
     const { data, error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .update(updateData)
       .eq('id', input.id)
       .select()
@@ -118,7 +125,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
 
   async deleteSubscription(id: string, userId: string): Promise<void> {
     const { error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .delete()
       .eq('id', id)
       .eq('user_id', userId);
@@ -130,7 +137,7 @@ export class SupabaseSubscriptionRepository implements ISubscriptionRepository {
 
   async getSubscriptionByExternalId(subscriptionId: string): Promise<ISubscription | null> {
     const { data, error } = await this.supabase
-      .from('subscriptions')
+      .from(this.getTableName())
       .select()
       .eq('subscription_id', subscriptionId)
       .single();

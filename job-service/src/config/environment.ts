@@ -19,6 +19,8 @@ interface Config {
   QUEUE_NAME: string;
   CHARGEBEE_SITE: string;
   CHARGEBEE_API_KEY: string;
+  FREE_REGISTERED_LIMIT: number;
+  OVERUSE_LIMIT: number;
 }
 
 const stageFromEnv = (process.env.STAGE || process.env.NODE_ENV || 'dev').toLowerCase();
@@ -27,7 +29,7 @@ const STAGE = stageFromEnv === 'development' ? 'dev' : stageFromEnv;
 const config: Config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   STAGE,
-  PORT: parseInt(process.env.PORT || '3000', 10),
+  PORT: parseInt(process.env.PORT || '3000'),
   JWT_SECRET: process.env.JWT_SECRET || 'fallback-secret-change-in-production',
   JWT_EXPIRE_IN: process.env.JWT_EXPIRE_IN || '7d',
   API_VERSION: process.env.API_VERSION || 'v1',
@@ -41,6 +43,8 @@ const config: Config = {
   QUEUE_NAME: process.env.QUEUE_NAME || '',
   CHARGEBEE_SITE: process.env.CHARGEBEE_SITE || '',
   CHARGEBEE_API_KEY: process.env.CHARGEBEE_API_KEY || '',
+  FREE_REGISTERED_LIMIT: parseInt(process.env.FREE_REGISTERED_LIMIT || '30'),
+  OVERUSE_LIMIT: parseInt(process.env.OVERUSE_LIMIT || '20'),
 };
 
 // Validate required environment variables in production

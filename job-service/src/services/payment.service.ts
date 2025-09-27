@@ -49,6 +49,12 @@ export class PaymentService {
   private async getUserGatewayId(userId: string) {
     return await this.userGatewayIdRepository.getUserGatewayId(userId);
   }
+  async getPageCredits(userId: string): Promise<number> {
+    console.log(">>> GETTING PAGE CREDITS", userId);
+    const pageCredits = await this.pageCreditRepository.getRemainingPageCredits(userId);
+    console.log(">>> PAGE CREDITS", pageCredits);
+    return pageCredits.reduce((acc, credit) => acc + credit.balance, 0);
+  }
   async getSubscription(userId: string, includeCredits: boolean = false) {
     const subscriptions = await this.subscriptionRepository.getSubscriptionsByUserId(userId);
     if (subscriptions.length > 0) {
@@ -71,7 +77,6 @@ export class PaymentService {
     const firstName = this.user.user_metadata?.name?.split(' ')[0];
     const lastName = this.user.user_metadata?.name?.split(' ')[1];
     const userGatewayId = await this.getUserGatewayId(this.user.id);
-    console.log('>>> USER GATEWAY ID', userGatewayId);
     if (purchaseType === PurchaseType.SUBSCRIPTION) {
       const existingSubscription = await this.getSubscription(this.user.id);
       if (existingSubscription) {

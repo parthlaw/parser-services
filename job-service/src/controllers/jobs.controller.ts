@@ -10,8 +10,9 @@ import {
 import ApiResponseHandler from '@/utils/apiResponseHandler';
 import { Request, Response } from 'express';
 import { asyncHandler } from '@/middleware/errorHandler';
-import { NotFoundError } from '@/utils/errors';
+import { NotFoundError, ValidationError } from '@/utils/errors';
 import { SupportedDownloadFormat } from '@/types/models';
+import logger from '@/utils/logger';
 
 export const getJobService = (userId?: string): JobService => {
   return new JobService(userId);
@@ -66,16 +67,25 @@ export const getJobs = asyncHandler(async (req: Request, res: Response): Promise
 
 export const getJobDownloadUrl = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const { format } = getJobDownloadUrlSchema.parse(req.query);
-    const { id } = getJobDownloadUrlParamsSchema.parse(req.params);
-    const jobDownloadUrl = await getJobService(req.user?.id as string).getJobDownloadUrl({
-      jobId: id,
-      format: format as SupportedDownloadFormat,
-    });
-    ApiResponseHandler.success(
-      res,
-      { downloadUrl: jobDownloadUrl },
-      'Job download URL fetched successfully'
-    );
+    try {
+      const { format } = getJobDownloadUrlSchema.parse(req.query);
+      const { id } = getJobDownloadUrlParamsSchema.parse(req.params);
+      const jobDownloadUrl = await getJobService(req.user?.id as string).getJobDownloadUrl({
+        jobId: id,
+        format: format as SupportedDownloadFormat,
+      });
+      ApiResponseHandler.success(
+        res,
+        { downloadUrl: jobDownloadUrl },
+        'Job download URL fetched successfully'
+      );
+    } catch (error: any) {
+      logger.error(error);
+      if (error instanceof ValidationError) {
+        ApiResponseHandler.badRequest(res, error.message, error.errorCode);
+      } else {
+        ApiResponseHandler.error(res, error, 'An error occurred');
+      }
+    }
   }
 );
