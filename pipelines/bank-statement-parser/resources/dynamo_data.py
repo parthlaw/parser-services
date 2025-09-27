@@ -61,6 +61,9 @@ class DynamoData(JobData):
                 "metadata": converted_additional_fields
             }
             
+            # Convert any float values in the entire job_data to Decimal
+            job_data = self._convert_floats_to_decimal(job_data)
+            
             if result_s3_path is not None:
                 job_data["result_s3_path"] = result_s3_path
             
@@ -128,7 +131,9 @@ class DynamoData(JobData):
                 
             if download_data is not None:
                 update_expression += ", download_data = :download_data"
-                expression_attribute_values[":download_data"] = download_data
+                # Convert any float values in download_data to Decimal
+                converted_download_data = self._convert_floats_to_decimal(download_data)
+                expression_attribute_values[":download_data"] = converted_download_data
 
             if failure_reason is not None:
                 update_expression += ", failure_reason = :failure_reason"
@@ -217,8 +222,11 @@ class DynamoData(JobData):
             response = self.table.scan(**scan_kwargs)
             items = response.get('Items', [])
             
+            # Convert any float values to Decimal before returning
+            converted_items = [self._convert_floats_to_decimal(item) for item in items]
+            
             # Sort by created_at descending and apply offset/limit
-            sorted_items = sorted(items, key=lambda x: x.get('created_at', ''), reverse=True)
+            sorted_items = sorted(converted_items, key=lambda x: x.get('created_at', ''), reverse=True)
             return sorted_items[offset:offset + limit]
             
         except ClientError as e:
